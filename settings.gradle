@@ -1,3 +1,4 @@
 // Gradle settings
 
-rootProject.name = 'uoe-sepp2021-coursework3-skeleton'
+rootProject.name = 'inf2c-sepp-cw3'
+
