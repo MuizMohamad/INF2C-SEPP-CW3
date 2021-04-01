@@ -14,12 +14,18 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 
 public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
+
   private String endpoint;
   private String CHI;
+  private String dietaryRestriction;
   private boolean isRegistered;
+  private ArrayList<Order> orderHistory;
+
   public ShieldingIndividualClientImp(String endpoint) {
     this.endpoint = endpoint;
     this.isRegistered = false;
+    this.dietaryRestriction = "none";
+    this.orderHistory = new ArrayList<Order>();
   }
 
   @Override
@@ -54,7 +60,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     String request = "/showFoodBox?orderOption=catering&dietaryPreference=" + dietaryPreference + "'";
 
     // setup the response recepient
-    List<DummyShieldingIndividualClientImp.MessagingFoodBox> responseBoxes = new ArrayList<DummyShieldingIndividualClientImp.MessagingFoodBox>();
+    List<FoodBox> responseBoxes = new ArrayList<FoodBox>();
 
     List<String> boxIds = new ArrayList<String>();
 
@@ -63,13 +69,14 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
       String response = ClientIO.doGETRequest(endpoint + request);
 
       // unmarshal response
-      Type listType = new TypeToken<List<DummyShieldingIndividualClientImp.MessagingFoodBox>>() {} .getType();
+      Type listType = new TypeToken<List<FoodBox>>() {} .getType();
       responseBoxes = new Gson().fromJson(response, listType);
 
       // gather required fields
-      for (DummyShieldingIndividualClientImp.MessagingFoodBox b : responseBoxes) {
-        boxIds.add(b.id);
+      for (FoodBox b : responseBoxes) {
+        boxIds.add(b.getID());
       }
+
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -79,7 +86,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public boolean placeOrder(LocalDateTime deliveryDateTime) {
-    return false;
+    boxIds = showFoodBoxes(this.dietaryRestriction);
   }
 
   @Override
@@ -94,13 +101,49 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public boolean requestOrderStatus(int orderNumber) {
-    return false;
+    // construct the endpoint request
+    String request = " /requestStatus?order id=" + orderNumber + "'";
+
+    // setup the response recepient
+
+    String response = new String();
+
+    try {
+      // perform request
+      String response = ClientIO.doGETRequest(endpoint + request);
+
+      // unmarshal response
+      responseRegister = new Gson().fromJson(response, String.class);
+
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   // **UPDATE**
   @Override
   public Collection<String> getCateringCompanies() {
-    return null;
+    // construct the endpoint request
+    String request = " /getCaterers";
+
+    // setup the response recepient
+
+    List<String> responseCaterers = new ArrayList<String>();
+
+    try {
+      // perform request
+      String response = ClientIO.doGETRequest(endpoint + request);
+
+      // unmarshal response
+      responseCaterers = new Gson().fromJson(response, String.class);
+
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return responseCaterers;
   }
 
   // **UPDATE**
