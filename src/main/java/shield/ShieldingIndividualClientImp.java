@@ -17,15 +17,17 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   private String endpoint;
   private String CHI;
-  private String dietaryRestriction;
+  private String dietaryPreference;
   private boolean isRegistered;
   private ArrayList<Order> orderHistory;
+  private List<FoodBox> defaultFoodBoxList;
 
   public ShieldingIndividualClientImp(String endpoint) {
     this.endpoint = endpoint;
     this.isRegistered = false;
-    this.dietaryRestriction = "none";
+    this.dietaryPreference = "none";
     this.orderHistory = new ArrayList<Order>();
+    this.defaultFoodBoxList = getDefaultFoodBoxListFromServer();
   }
 
   @Override
@@ -74,7 +76,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
       // gather required fields
       for (FoodBox b : responseBoxes) {
-        boxIds.add(b.getID());
+        boxIds.add(b.getFoodBoxID());
       }
 
     } catch (Exception e) {
@@ -86,7 +88,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public boolean placeOrder(LocalDateTime deliveryDateTime) {
-    boxIds = showFoodBoxes(this.dietaryRestriction);
+    return false;
   }
 
   @Override
@@ -106,7 +108,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
     // setup the response recepient
 
-    String response = new String();
+    String responseRegister = new String();
 
     try {
       // perform request
@@ -136,7 +138,8 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
       String response = ClientIO.doGETRequest(endpoint + request);
 
       // unmarshal response
-      responseCaterers = new Gson().fromJson(response, String.class);
+      Type listType = new TypeToken<List<String>>() {} .getType();
+      responseCaterers = new Gson().fromJson(response, listType);
 
 
     } catch (Exception e) {
@@ -164,33 +167,73 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public int getFoodBoxNumber() {
-    return 0;
+    ArrayList<String> boxIds = showFoodBoxes(this.dietaryPreference);
+    return boxIds.length();
   }
 
   @Override
   public String getDietaryPreferenceForFoodBox(int foodBoxId) {
-    return null;
+    FoodBox foundFoodBox = getFoodBoxfromID(foodBoxId);
+    return foundFoodBox.getFoodBoxDiet();
   }
 
   @Override
   public int getItemsNumberForFoodBox(int foodBoxId) {
-    return 0;
+
+    FoodBox foundFoodBox = getFoodBoxfromID(foodBoxId);
+    return foundFoodBox.getContents().length();
   }
+
+
 
   @Override
   public Collection<Integer> getItemIdsForFoodBox(int foodboxId) {
+
+    List<Integer> itemIDs = new ArrayList<Integer>();
+
+    FoodBox foundFoodBox = getFoodBoxfromID(foodboxId);
+
+    for (FoodItem f : foundFoodBox.getContents()){
+          itemIDs.add(f.getFoodItemID());
+    }
+
+    return itemIDs;
+  }
+
+  private FoodBox getFoodBoxfromID(int foodBoxId){
+    for (FoodBox b : defaultFoodBoxList) {
+      if (b.getFoodBoxID().equals(foodBoxId)){
+        return b;
+      }
+    }
+
     return null;
   }
 
   @Override
   public String getItemNameForFoodBox(int itemId, int foodBoxId) {
-    return null;
+    FoodItem foundFoodItem = getFoodItemfromID(itemId,foodBoxId);
+    return foundFoodItem.getItemName();
   }
 
   @Override
   public int getItemQuantityForFoodBox(int itemId, int foodBoxId) {
-    return 0;
+    FoodItem foundFoodItem = getFoodItemfromID(itemId,foodBoxId);
+    return foundFoodItem.getQuantity();
   }
+
+  private FoodItem getFoodItemfromID(int itemID,int foodBoxID){
+
+    FoodBox foundFoodBox = getFoodBoxfromID(foodBoxID);
+
+    for (FoodItem f : foundFoodBox.getContents()){
+      if(f.getFoodItemID() == itemID){
+            return f;
+      }
+    }
+    return null;
+  }
+
 
   @Override
   public boolean pickFoodBox(int foodBoxId) {
@@ -241,5 +284,33 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public String getClosestCateringCompany() {
     return null;
+  }
+
+  private List<FoodBox> getDefaultFoodBoxListFromServer(){
+    // construct the endpoint request
+    String request = "/showFoodBox?orderOption=catering&dietaryPreference=none";
+
+    // setup the response recepient
+    List<FoodBox> responseBoxes = new ArrayList<FoodBox>();
+
+    List<Integer> itemIDs = new ArrayList<Integer>();
+
+    try {
+      // perform request
+      String response = ClientIO.doGETRequest(endpoint + request);
+
+      // unmarshal response
+      Type listType = new TypeToken<List<FoodBox>>() {} .getType();
+      responseBoxes = new Gson().fromJson(response, listType);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return responseBoxes;
+  }
+
+  public void setDietaryPreference(String dietaryPreference){
+    this.dietaryPreference = dietaryPreference;
   }
 }

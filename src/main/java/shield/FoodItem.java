@@ -2,8 +2,22 @@ package shield;
 
 public class FoodItem {
 
-    private String itemName;
+    private String name;
     private int quantity;
-    private String dietaryRestrictions;
+    private int id;
+
+    public String getItemName(){
+        return name;
+    }
+
+    public int getQuantity(){
+        return quantity;
+    }
+
+    public int getFoodItemID() {
+        return id;
+    }
+
+
 
 }
