@@ -52,8 +52,14 @@ public class ShieldingIndividualClientTest {
     Random rand = new Random();
     String chi = String.valueOf(rand.nextInt(10000));
 
-    assertTrue(client.registerShieldingIndividual(chi));
-    assertTrue(client.isRegistered());
+    assertTrue(client.registerShieldingIndividual(chi),"Registration Failed");
+    assertTrue(client.isRegistered(), "Not Registered");
     assertEquals(client.getCHI(), chi);
   }
+
+  @Test
+  public void testPlaceFoodBoxOrder() {
+    Assertions.fail();
+  }
+
 }

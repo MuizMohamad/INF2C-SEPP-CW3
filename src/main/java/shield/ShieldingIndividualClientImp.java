@@ -4,21 +4,77 @@
 
 package shield;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 
 public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
+  private String endpoint;
+  private String CHI;
+  private boolean isRegistered;
   public ShieldingIndividualClientImp(String endpoint) {
+    this.endpoint = endpoint;
+    this.isRegistered = false;
   }
 
   @Override
   public boolean registerShieldingIndividual(String CHI) {
-    return false;
+    // construct the endpoint request
+    String request = " /registerShieldingIndividual?CHI=" + CHI + "'";
+
+    // setup the response recepient
+
+    String responseRegister = new String();
+
+    try {
+      // perform request
+      String response = ClientIO.doGETRequest(endpoint + request);
+
+      // unmarshal response
+      responseRegister = new Gson().fromJson(response, String.class);
+
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    this.isRegistered = true;
+    this.CHI = CHI;
+    return true;
   }
 
   @Override
   public Collection<String> showFoodBoxes(String dietaryPreference) {
-    return null;
+    // construct the endpoint request
+    String request = "/showFoodBox?orderOption=catering&dietaryPreference=" + dietaryPreference + "'";
+
+    // setup the response recepient
+    List<DummyShieldingIndividualClientImp.MessagingFoodBox> responseBoxes = new ArrayList<DummyShieldingIndividualClientImp.MessagingFoodBox>();
+
+    List<String> boxIds = new ArrayList<String>();
+
+    try {
+      // perform request
+      String response = ClientIO.doGETRequest(endpoint + request);
+
+      // unmarshal response
+      Type listType = new TypeToken<List<DummyShieldingIndividualClientImp.MessagingFoodBox>>() {} .getType();
+      responseBoxes = new Gson().fromJson(response, listType);
+
+      // gather required fields
+      for (DummyShieldingIndividualClientImp.MessagingFoodBox b : responseBoxes) {
+        boxIds.add(b.id);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return boxIds;
   }
 
   @Override
@@ -55,12 +111,12 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public boolean isRegistered() {
-    return false;
+    return this.isRegistered;
   }
 
   @Override
   public String getCHI() {
-    return null;
+    return this.CHI;
   }
 
   @Override
