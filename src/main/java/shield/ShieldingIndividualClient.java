@@ -142,13 +142,6 @@ public interface ShieldingIndividualClient extends ShieldingIndividualClientEndp
   */
   public boolean setItemQuantityForOrder(int itemId, int orderNumber, int quantity);
 
-  /**
-  * Returns the date and time of the required delivery time for the requested order
-  *
-  * @param  orderNumber the order number
-  * @return date and time of the required delivery time for the requested order
-  */
-  public LocalDateTime getDeliveryTimeForOrder(int orderNumber);
 
   // **UPDATE**
   /**

@@ -18,6 +18,9 @@ public class FoodItem {
         return id;
     }
 
+    public void changeQuantity(int quantity){
+        this.quantity = quantity;
+    }
 
 
 }

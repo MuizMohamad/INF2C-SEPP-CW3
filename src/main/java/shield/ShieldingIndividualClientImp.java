@@ -22,6 +22,8 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   private ArrayList<Order> orderHistory;
   private List<FoodBox> defaultFoodBoxList;
 
+  private FoodBox tempPickedFoodBox;
+
   public ShieldingIndividualClientImp(String endpoint) {
     this.endpoint = endpoint;
     this.isRegistered = false;
@@ -121,6 +123,8 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     } catch (Exception e) {
       e.printStackTrace();
     }
+
+    return true;
   }
 
   // **UPDATE**
@@ -167,8 +171,8 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public int getFoodBoxNumber() {
-    ArrayList<String> boxIds = showFoodBoxes(this.dietaryPreference);
-    return boxIds.length();
+    Collection<String> boxIds = showFoodBoxes(this.dietaryPreference);
+    return boxIds.size();
   }
 
   @Override
@@ -181,7 +185,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   public int getItemsNumberForFoodBox(int foodBoxId) {
 
     FoodBox foundFoodBox = getFoodBoxfromID(foodBoxId);
-    return foundFoodBox.getContents().length();
+    return foundFoodBox.getContents().size();
   }
 
 
@@ -237,47 +241,105 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public boolean pickFoodBox(int foodBoxId) {
-    return false;
+    tempPickedFoodBox = getFoodBoxfromID(foodBoxId);
+    return true;
   }
 
   @Override
   public boolean changeItemQuantityForPickedFoodBox(int itemId, int quantity) {
-    return false;
+
+    for (FoodItem c : tempPickedFoodBox.getContents()){
+      if (c.getFoodItemID() == itemId){
+        c.changeQuantity(quantity);
+      }
+    }
+
+    return true;
   }
 
   @Override
   public Collection<Integer> getOrderNumbers() {
-    return null;
+
+    List<Integer> orderIDs = new ArrayList<Integer>();
+
+    for (Order o : orderHistory){
+      orderIDs.add(o.getOrderNumber());
+    }
+    return orderIDs;
   }
 
   @Override
   public String getStatusForOrder(int orderNumber) {
-    return null;
+
+    Order chosenOrder = getOrderfromOrderNumber(orderNumber);
+    return chosenOrder.getOrderStatus();
   }
 
   @Override
   public Collection<Integer> getItemIdsForOrder(int orderNumber) {
-    return null;
+    Order chosenOrder = getOrderfromOrderNumber(orderNumber);
+
+    List<Integer> itemIDs = new ArrayList<Integer>();
+
+    FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
+    List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
+
+    for (FoodItem i : foodBoxContent){
+      itemIDs.add(i.getFoodItemID());
+    }
+    return itemIDs;
   }
 
   @Override
   public String getItemNameForOrder(int itemId, int orderNumber) {
+    Order chosenOrder = getOrderfromOrderNumber(orderNumber);
+
+    FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
+    List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
+
+    for (FoodItem i : foodBoxContent){
+      if (i.getFoodItemID() == itemId){
+        return i.getItemName();
+      }
+    }
+
     return null;
   }
 
   @Override
   public int getItemQuantityForOrder(int itemId, int orderNumber) {
+    Order chosenOrder = getOrderfromOrderNumber(orderNumber);
+
+    FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
+    List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
+
+    for (FoodItem i : foodBoxContent){
+      if (i.getFoodItemID() == itemId){
+        return i.getQuantity();
+      }
+    }
     return 0;
+  }
+
+  private Order getOrderfromOrderNumber(int orderNumber){
+    for (Order o : orderHistory){
+      if (o.getOrderNumber() == orderNumber){
+        return o;
+      }
+    }
+    return null;
   }
 
   @Override
   public boolean setItemQuantityForOrder(int itemId, int orderNumber, int quantity) {
-    return false;
-  }
 
-  @Override
-  public LocalDateTime getDeliveryTimeForOrder(int orderNumber) {
-    return null;
+    for (Order o:orderHistory){
+      if (o.getOrderNumber() == orderNumber){
+        o.getOrderedFoodBox().changeItemQuantity(itemId,quantity);
+      }
+    }
+
+    return true;
   }
 
   // **UPDATE**

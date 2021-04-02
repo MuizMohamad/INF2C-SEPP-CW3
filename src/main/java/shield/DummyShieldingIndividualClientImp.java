@@ -186,11 +186,6 @@ public class DummyShieldingIndividualClientImp implements ShieldingIndividualCli
     return false;
   }
 
-  @Override
-  public LocalDateTime getDeliveryTimeForOrder(int orderNumber) {
-    return null;
-  }
-
   // **UPDATE**
   @Override
   public String getClosestCateringCompany() {

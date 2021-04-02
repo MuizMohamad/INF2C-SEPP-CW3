@@ -31,5 +31,13 @@ public class FoodBox {
     public String getDelivered_by(){
         return delivered_by;
     }
+
+    public void changeItemQuantity(int itemIds, int quantity){
+        for (FoodItem i : contents){
+            if (i.getFoodItemID() == itemIds){
+                i.changeQuantity(quantity);
+            }
+        }
+    }
 }
 
