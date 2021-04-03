@@ -55,7 +55,24 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
   public boolean updateOrderStatus(int orderNumber, String status) {
     // construct the endpoint request
     String request = " /updateOrderStatus?order_id=" + orderNumber + "&newStatus=" + status + "'";
-    return false;
+
+    // setup the response recepient
+
+    String responseRegister = new String();
+
+    try {
+      // perform request
+      String response = ClientIO.doGETRequest(endpoint + request);
+
+      // unmarshal response
+      responseRegister = new Gson().fromJson(response, String.class);
+
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return true;
   }
 
   @Override
