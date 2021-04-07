@@ -19,11 +19,11 @@ import java.util.Random;
  *
  */
 
-public class SupermarketClientTest {
+public class ShieldingIndividualClientImpTest {
   private final static String clientPropsFilename = "client.cfg";
 
   private Properties clientProps;
-  private SupermarketClient client;
+  private ShieldingIndividualClient client;
 
   private Properties loadProperties(String propsFilename) {
     ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -43,18 +43,23 @@ public class SupermarketClientTest {
   public void setup() {
     clientProps = loadProperties(clientPropsFilename);
 
-    client = new SupermarketClientImp(clientProps.getProperty("endpoint"));
+    client = new ShieldingIndividualClientImp(clientProps.getProperty("endpoint"));
   }
 
 
   @Test
-  public void testSupermarketNewRegistration() {
+  public void testShieldingIndividualNewRegistration() {
     Random rand = new Random();
-    String name = String.valueOf(rand.nextInt(10000));
-    String postCode = String.valueOf(rand.nextInt(10000));
+    String chi = String.valueOf(rand.nextInt(10000));
 
-    assertTrue(client.registerSupermarket(name, postCode));
-    assertTrue(client.isRegistered());
-    assertEquals(client.getName(), name);
+    assertTrue(client.registerShieldingIndividual(chi),"Registration Failed");
+    assertTrue(client.isRegistered(), "Not Registered");
+    assertEquals(client.getCHI(), chi);
   }
+
+  @Test
+  public void testPlaceFoodBoxOrder() {
+    Assertions.fail();
+  }
+
 }

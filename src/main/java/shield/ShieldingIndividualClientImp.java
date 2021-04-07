@@ -88,8 +88,9 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return boxIds;
   }
 
+  // **UPDATE2** REMOVED PARAMETER
   @Override
-  public boolean placeOrder(LocalDateTime deliveryDateTime) {
+  public boolean placeOrder() {
     return false;
   }
 

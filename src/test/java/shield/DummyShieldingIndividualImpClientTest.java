@@ -18,7 +18,7 @@ import java.io.InputStream;
  *
  */
 
-public class DummyShieldingIndividualClientTest {
+public class DummyShieldingIndividualImpClientTest {
   private final static String clientPropsFilename = "client.cfg";
 
   private Properties clientProps;
