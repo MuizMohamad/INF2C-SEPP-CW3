@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.lang.reflect.Type;
-import java.time.LocalDateTime;
 
 public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
@@ -107,7 +106,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public boolean requestOrderStatus(int orderNumber) {
     // construct the endpoint request
-    String request = " /requestStatus?order id=" + orderNumber + "'";
+    String request = " /requestStatus?order_id=" + orderNumber + "'";
 
     // setup the response recepient
 
@@ -157,7 +156,27 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   // **UPDATE**
   @Override
   public float getDistance(String postCode1, String postCode2) {
-    return 0;
+
+    // construct the endpoint request
+    String request = "/distance?postcode1=" + postCode1 + "&postcode2=" + postCode2 ;
+
+    // setup the response recepient
+
+    float responseDistance = 0;
+
+    try {
+      // perform request
+      String response = ClientIO.doGETRequest(endpoint + request);
+
+      // unmarshal response
+      responseDistance = new Gson().fromJson(response, float.class);
+
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return responseDistance;
   }
 
   @Override
@@ -172,8 +191,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public int getFoodBoxNumber() {
-    Collection<String> boxIds = showFoodBoxes(this.dietaryPreference);
-    return boxIds.size();
+    return defaultFoodBoxList.size();
   }
 
   @Override
@@ -272,13 +290,13 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public String getStatusForOrder(int orderNumber) {
 
-    Order chosenOrder = getOrderfromOrderNumber(orderNumber);
+    Order chosenOrder = getOrdersOrderNumber(orderNumber);
     return chosenOrder.getOrderStatus();
   }
 
   @Override
   public Collection<Integer> getItemIdsForOrder(int orderNumber) {
-    Order chosenOrder = getOrderfromOrderNumber(orderNumber);
+    Order chosenOrder = getOrdersOrderNumber(orderNumber);
 
     List<Integer> itemIDs = new ArrayList<Integer>();
 
@@ -293,7 +311,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public String getItemNameForOrder(int itemId, int orderNumber) {
-    Order chosenOrder = getOrderfromOrderNumber(orderNumber);
+    Order chosenOrder = getOrdersOrderNumber(orderNumber);
 
     FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
     List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
@@ -309,7 +327,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public int getItemQuantityForOrder(int itemId, int orderNumber) {
-    Order chosenOrder = getOrderfromOrderNumber(orderNumber);
+    Order chosenOrder = getOrdersOrderNumber(orderNumber);
 
     FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
     List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
@@ -322,7 +340,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return 0;
   }
 
-  private Order getOrderfromOrderNumber(int orderNumber){
+  private Order getOrdersOrderNumber(int orderNumber){
     for (Order o : orderHistory){
       if (o.getOrderNumber() == orderNumber){
         return o;

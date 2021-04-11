@@ -22,5 +22,9 @@ public class FoodItem {
         this.quantity = quantity;
     }
 
+    public String getFoodItemName(){
+        return this.name;
+    }
+
 
 }

@@ -57,7 +57,7 @@ public interface ShieldingIndividualClient extends ShieldingIndividualClientEndp
   /**
   * Returns the collection of item ids of the requested foodbox
   *
-  * @param  foodBoxId the food box id as last returned from the server
+  * @param  foodboxId the food box id as last returned from the server
   * @return collection of item ids of the requested foodbox
   */
   public Collection<Integer> getItemIdsForFoodBox(int foodboxId);

@@ -16,6 +16,7 @@ public class FoodBox {
     public List<FoodItem> getContents(){
         return contents;
     }
+
     public String getFoodBoxID(){
         return this.id;
     }
