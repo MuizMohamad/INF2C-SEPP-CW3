@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CateringCompanyClientImp implements CateringCompanyClient {
   private String endpoint;
@@ -26,6 +28,10 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
 
   @Override
   public boolean registerCateringCompany(String name, String postCode) {
+
+    if (checkPostCodeFormat(postCode) == false){
+      return false;
+    }
     // construct the endpoint request
     String request = " /registerCateringCompany?business_name=" + name + "&postcode=" + postCode + "'";
 
@@ -88,5 +94,16 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
   @Override
   public String getPostCode() {
     return this.postCode;
+  }
+
+  private boolean checkPostCodeFormat(String postCode){
+
+    String regex = "EH[1-17]_[1-9][A-Z][A-Z]";
+    Pattern format = Pattern.compile(regex);
+    Matcher mt = format.matcher(postCode);
+
+    boolean result = mt.matches();
+
+    return result;
   }
 }

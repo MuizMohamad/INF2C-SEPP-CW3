@@ -2,9 +2,10 @@ package shield;
 
 public class FoodItem {
 
+    private int id;
     private String name;
     private int quantity;
-    private int id;
+
 
     public String getItemName(){
         return name;

@@ -6,6 +6,11 @@ public class Order{
     private String orderStatus;
     private int orderNumber;
 
+    public Order(FoodBox orderedFoodBox,String orderStatus,int orderNumber){
+        this.orderedFoodBox = orderedFoodBox;
+        this.orderStatus = orderStatus;
+        this.orderNumber = orderNumber;
+    }
     public FoodBox getOrderedFoodBox(){
         return orderedFoodBox;
     }
@@ -18,4 +23,7 @@ public class Order{
         return orderNumber;
     }
 
+    public void setOrderStatus(String orderStatus){
+        this.orderStatus = orderStatus;
+    }
 }

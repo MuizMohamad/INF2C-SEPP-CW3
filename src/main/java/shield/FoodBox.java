@@ -40,5 +40,15 @@ public class FoodBox {
             }
         }
     }
+
+    public int getItemQuantity(int itemIds){
+        for (FoodItem i : contents){
+            if (i.getFoodItemID() == itemIds){
+                return i.getQuantity();
+            }
+        }
+
+        return 0;
+    }
 }
 
