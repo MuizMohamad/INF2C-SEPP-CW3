@@ -98,7 +98,7 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
 
   private boolean checkPostCodeFormat(String postCode){
 
-    String regex = "EH[1-17]_[1-9][A-Z][A-Z]";
+    String regex = "EH([1-9]|1[0-7])_[1-9][A-Z][A-Z]";
     Pattern format = Pattern.compile(regex);
     Matcher mt = format.matcher(postCode);
 

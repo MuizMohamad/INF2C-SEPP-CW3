@@ -8,9 +8,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.List;
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.lang.reflect.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,43 +41,52 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   @Override
   public boolean registerShieldingIndividual(String CHI) {
+
+    Objects.requireNonNull(CHI);
+
+    if (!checkCHIFormat(CHI)){
+      return false;
+    }
     // construct the endpoint request
-    String request = " /registerShieldingIndividual?CHI=" + CHI + "'";
+    String request = "/registerShieldingIndividual?CHI=" + CHI ;
 
     // setup the response recepient
 
-    ArrayList<String> responseRegister = new ArrayList<String>();
+    ArrayList<String> responseRegister;
 
     try {
       // perform request
       String response = ClientIO.doGETRequest(endpoint + request);
 
+      if (!response.equals("already registered")) {
+        Type listType = new TypeToken<ArrayList<String>>() {
+        }.getType();
+        responseRegister = new Gson().fromJson(response, listType);
+
+        this.postcode = responseRegister.get(0);
+        this.name = responseRegister.get(1);
+        this.surname = responseRegister.get(2);
+        this.phoneNumber = responseRegister.get(3);
+      }
+
       // unmarshal response
-      Type listType = new TypeToken<ArrayList<String>>() {} .getType();
-      responseRegister = new Gson().fromJson(response, listType);
-
-
     } catch (Exception e) {
       e.printStackTrace();
     }
 
-    this.postcode = responseRegister.get(0);
-    this.name = responseRegister.get(1);
-    this.surname = responseRegister.get(2);
-    this.phoneNumber = responseRegister.get(3);
-
     this.isRegistered = true;
     this.CHI = CHI;
+
     return true;
   }
 
   @Override
   public Collection<String> showFoodBoxes(String dietaryPreference) {
     // construct the endpoint request
-    String request = "/showFoodBox?orderOption=catering&dietaryPreference=" + dietaryPreference + "'";
+    String request = "/showFoodBox?orderOption=catering&dietaryPreference=" + dietaryPreference ;
 
     // setup the response recepient
-    List<FoodBox> responseBoxes = new ArrayList<FoodBox>();
+    List<FoodBox> responseBoxes;
 
     List<String> boxIds = new ArrayList<>();
 
@@ -116,7 +125,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     String closestCateringPostCode = getPostCodefromCaterersList(caterersInfo,closestCateringName);
     // construct the endpoint request
     String request = "placeOrder?individual_id="+ this.CHI + "&catering_business_name=" + closestCateringName +
-            "&catering postcode=" + closestCateringPostCode ;
+            "&catering_postcode=" + closestCateringPostCode ;
 
     Gson gson = new Gson();
     String foodBoxInfoJson = gson.toJson(tempPickedFoodBox.getContents());
@@ -144,7 +153,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public boolean editOrder(int orderNumber) {
     // construct the endpoint request
-    String request = "/editOrder?order_id=" + orderNumber + "'";
+    String request = "/editOrder?order_id=" + orderNumber ;
 
     boolean responseEdit = false;
 
@@ -166,7 +175,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public boolean cancelOrder(int orderNumber) {
     // construct the endpoint request
-    String request = "/cancelOrder?order_id=" + orderNumber + "'";
+    String request = "/cancelOrder?order_id=" + orderNumber;
 
     boolean responseCancel = false;
     if (getStatusForOrder(orderNumber).equals("CANCELLED")){
@@ -185,18 +194,18 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
       e.printStackTrace();
     }
 
-    getOrdersOrderNumber(orderNumber).setOrderStatus("4");
+    Objects.requireNonNull(getOrdersOrderNumber(orderNumber)).setOrderStatus("4");
     return responseCancel;
   }
 
   @Override
   public boolean requestOrderStatus(int orderNumber) {
     // construct the endpoint request
-    String request = " /requestStatus?order_id=" + orderNumber + "'";
+    String request = " /requestStatus?order_id=" + orderNumber;
 
     // setup the response recepient
 
-    String responseRegister = "";
+    String responseRegister;
 
     try {
       // perform request
@@ -208,9 +217,10 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
     } catch (Exception e) {
       e.printStackTrace();
+      return false;
     }
 
-    getOrdersOrderNumber(orderNumber).setOrderStatus(responseRegister);
+    Objects.requireNonNull(getOrdersOrderNumber(orderNumber)).setOrderStatus(responseRegister);
 
     return true;
   }
@@ -285,6 +295,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public String getDietaryPreferenceForFoodBox(int foodBoxId) {
     FoodBox foundFoodBox = getFoodBoxfromID(foodBoxId);
+    assert foundFoodBox != null;
     return foundFoodBox.getFoodBoxDiet();
   }
 
@@ -292,6 +303,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   public int getItemsNumberForFoodBox(int foodBoxId) {
 
     FoodBox foundFoodBox = getFoodBoxfromID(foodBoxId);
+    assert foundFoodBox != null;
     return foundFoodBox.getContents().size();
   }
 
@@ -300,10 +312,11 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public Collection<Integer> getItemIdsForFoodBox(int foodboxId) {
 
-    List<Integer> itemIDs = new ArrayList<Integer>();
+    List<Integer> itemIDs = new ArrayList<>();
 
     FoodBox foundFoodBox = getFoodBoxfromID(foodboxId);
 
+    assert foundFoodBox != null;
     for (FoodItem f : foundFoodBox.getContents()){
           itemIDs.add(f.getFoodItemID());
     }
@@ -312,6 +325,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   }
 
   private FoodBox getFoodBoxfromID(int foodBoxId){
+
     for (FoodBox b : defaultFoodBoxList) {
       int id = Integer.parseInt(b.getFoodBoxID());
       if (id == foodBoxId){
@@ -325,12 +339,14 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public String getItemNameForFoodBox(int itemId, int foodBoxId) {
     FoodItem foundFoodItem = getFoodItemfromID(itemId,foodBoxId);
+    assert foundFoodItem != null;
     return foundFoodItem.getItemName();
   }
 
   @Override
   public int getItemQuantityForFoodBox(int itemId, int foodBoxId) {
     FoodItem foundFoodItem = getFoodItemfromID(itemId,foodBoxId);
+    assert foundFoodItem != null;
     return foundFoodItem.getQuantity();
   }
 
@@ -338,6 +354,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
     FoodBox foundFoodBox = getFoodBoxfromID(foodBoxID);
 
+    assert foundFoodBox != null;
     for (FoodItem f : foundFoodBox.getContents()){
       if(f.getFoodItemID() == itemID){
             return f;
@@ -350,6 +367,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public boolean pickFoodBox(int foodBoxId) {
     tempPickedFoodBox = getFoodBoxfromID(foodBoxId);
+    Objects.requireNonNull(tempPickedFoodBox);
     return true;
   }
 
@@ -368,7 +386,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public Collection<Integer> getOrderNumbers() {
 
-    List<Integer> orderIDs = new ArrayList<Integer>();
+    List<Integer> orderIDs = new ArrayList<>();
 
     for (Order o : orderHistory){
       orderIDs.add(o.getOrderNumber());
@@ -380,15 +398,21 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   public String getStatusForOrder(int orderNumber) {
 
     Order chosenOrder = getOrdersOrderNumber(orderNumber);
-    assert chosenOrder != null;
-    return switch (chosenOrder.getOrderStatus()) {
-      case "0" -> "PLACED";
-      case "1" -> "PACKED";
-      case "2" -> "DISPATCHED";
-      case "3" -> "DELIVERED";
-      case "4" -> "CANCELLED";
-      default -> "NOT EXIST";
-    };
+    Objects.requireNonNull(chosenOrder);
+    switch (chosenOrder.getOrderStatus()) {
+      case "0" :
+        return "PLACED";
+      case "1" :
+        return "PACKED";
+      case "2" :
+        return "DISPATCHED";
+      case "3":
+        return "DELIVERED";
+      case "4" :
+        return "CANCELLED";
+      default :
+        return "NOT EXIST";
+    }
   }
 
   @Override
@@ -397,6 +421,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
     List<Integer> itemIDs = new ArrayList<Integer>();
 
+    assert chosenOrder != null;
     FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
     List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
 
@@ -410,6 +435,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   public String getItemNameForOrder(int itemId, int orderNumber) {
     Order chosenOrder = getOrdersOrderNumber(orderNumber);
 
+    assert chosenOrder != null;
     FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
     List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
 
@@ -426,6 +452,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   public int getItemQuantityForOrder(int itemId, int orderNumber) {
     Order chosenOrder = getOrdersOrderNumber(orderNumber);
 
+    assert chosenOrder != null;
     FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
     List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
 
@@ -491,12 +518,10 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   private List<FoodBox> getDefaultFoodBoxListFromServer(){
     // construct the endpoint request
-    String request = "/showFoodBox?orderOption=catering&dietaryPreference=none";
+    String request = "/showFoodBox?orderOption=catering&dietaryPreference=";
 
     // setup the response recepient
-    List<FoodBox> responseBoxes = new ArrayList<FoodBox>();
-
-    List<Integer> itemIDs = new ArrayList<Integer>();
+    List<FoodBox> responseBoxes = new ArrayList<>();
 
     try {
       // perform request
@@ -552,12 +577,34 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   private boolean checkCHIFormat(String CHI){
 
     boolean goodLength = CHI.length() == 10 ;
-    String regex = "[1-31][1-12][0-99]\\d\\d\\d\\d";
+    assert goodLength;
+    boolean validDate = validateJavaDate(CHI.substring(0,6));
+
+    String regex = "[0-9]+";
     Pattern format = Pattern.compile(regex);
     Matcher mt = format.matcher(CHI);
 
-    boolean result = mt.matches();
+    boolean allDigits = mt.matches();
 
-    return result ;
+    boolean result = goodLength && validDate && allDigits;
+
+    return result;
   }
+
+  private boolean validateJavaDate(String strDate) {
+
+    SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+
+    try {
+      Date javaDate = format.parse(strDate);
+    }
+    /* Date format is invalid */
+    catch (ParseException e)
+    {
+      return false;
+    }
+      /* Return true if date format is valid */
+    return true;
+  }
+
 }
