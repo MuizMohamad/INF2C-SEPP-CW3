@@ -145,4 +145,62 @@ public class SystemTests {
         assertEquals(individualClient.getStatusForOrder(firstOrderNumber),"PLACED");
 
     }
+
+
+    @Test
+    public void testEditFoodBox(){
+
+        String chi = "1009205638";
+        assertTrue(individualClient.registerShieldingIndividual(chi));
+
+        ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
+        Random rand = new Random();
+        int randomId = Integer.parseInt(foodBoxIds.get(rand.nextInt(foodBoxIds.size())));
+
+        assertTrue(individualClient.pickFoodBox(randomId));
+        assertTrue(individualClient.placeOrder());
+
+        ArrayList<Integer> allOrders = new ArrayList<>(individualClient.getOrderNumbers());
+        int firstOrderNumber = allOrders.get(0);
+
+    }
+
+    // In general case where the order has been packed, it should fail
+    @Test
+    public void testEditFooxBoxAfterPacked(){
+
+    }
+
+
+    // In general case where the order has not been dispatched, it should be successful
+    @Test
+    public void testCancelOrder(){
+
+    }
+
+    // In general case where the order has not been packed, it should be successful
+    @Test
+    public void testCancelOrderPacked(){
+
+    }
+
+    // Order cancel should failed if it is cancelled after dispatched
+    @Test
+    public void testCancelOrderAfterDispatched(){
+
+    }
+
+    // Test that the request order status give the correct order status,
+    // by updating the order status on specific value and check if the requested status is the same
+    @Test
+    public void testRequestOrderStatus(){
+
+    }
+
+    // Test that update order status will update the server correctly
+    // and also when we request the status, it will be the same status as the updated one.
+    @Test
+    public void testUpdateOrderStatus(){
+
+    }
 }

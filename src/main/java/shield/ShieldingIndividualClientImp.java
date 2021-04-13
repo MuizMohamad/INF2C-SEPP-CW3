@@ -157,6 +157,11 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
     boolean responseEdit = false;
 
+    requestOrderStatus(orderNumber);
+    String orderStatus = getStatusForOrder(orderNumber);
+    if (!orderStatus.equals("PLACED")){
+      return false;
+    }
     try {
       // perform request
       String response = ClientIO.doGETRequest(endpoint + request);
