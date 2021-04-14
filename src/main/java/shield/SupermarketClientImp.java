@@ -6,6 +6,9 @@ package shield;
 
 import com.google.gson.Gson;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SupermarketClientImp implements SupermarketClient {
   private String endpoint;
   private String name;
@@ -19,8 +22,12 @@ public class SupermarketClientImp implements SupermarketClient {
 
   @Override
   public boolean registerSupermarket(String name, String postCode) {
+
+    if (!checkPostCodeFormat(postCode)){
+      return false;
+    }
     // construct the endpoint request
-    String request = "/registerSupermarket?business_name=" + name + "&postcode=" + postCode + "'";
+    String request = "/registerSupermarket?business_name=" + name + "&postcode=" + postCode;
 
     // setup the response recepient
 
@@ -46,8 +53,10 @@ public class SupermarketClientImp implements SupermarketClient {
 
   @Override
   public boolean recordSupermarketOrder(String CHI, int orderNumber) {
+
     // construct the endpoint request
-    String request = "/recordSupermarketOrder?individual_id=" + CHI + "&order_number=" + orderNumber + "&supermarket_business_name=" +  this.name + "&supermarket_postcode=" + this.postCode + "'";
+    String request = "/recordSupermarketOrder?individual_id=" + CHI + "&order_number=" + orderNumber
+            + "&supermarket_business_name=" +  this.name + "&supermarket_postcode=" + this.postCode;
 
     // setup the response recepient
 
@@ -72,7 +81,7 @@ public class SupermarketClientImp implements SupermarketClient {
   @Override
   public boolean updateOrderStatus(int orderNumber, String status) {
     // construct the endpoint request
-    String request = "/updateSupermarketOrderStatus?order_id=" + orderNumber + "&newStatus=" + status + "'";
+    String request = "/updateSupermarketOrderStatus?order_id=" + orderNumber + "&newStatus=" + status;
 
     // setup the response recepient
 
@@ -106,5 +115,16 @@ public class SupermarketClientImp implements SupermarketClient {
   @Override
   public String getPostCode() {
     return this.postCode;
+  }
+
+  private boolean checkPostCodeFormat(String postCode){
+
+    String regex = "EH([1-9]|1[0-7])_[1-9][A-Z][A-Z]";
+    Pattern format = Pattern.compile(regex);
+    Matcher mt = format.matcher(postCode);
+
+    boolean result = mt.matches();
+
+    return result;
   }
 }

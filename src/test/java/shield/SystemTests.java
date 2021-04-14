@@ -1,11 +1,13 @@
 package shield;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
@@ -57,28 +59,76 @@ public class SystemTests {
         assertTrue(individualClient.registerShieldingIndividual(chi),"Registration Failed");
         assertTrue(individualClient.isRegistered(), "Not Registered");
         assertEquals(individualClient.getCHI(), chi);
+
+        // construct the endpoint request
+        String request = "/registerShieldingIndividual?CHI=" + chi ;
+
+        // setup the response recepient
+        String response = "";
+        try {
+            // perform request
+            response = ClientIO.doGETRequest(clientProps.getProperty("endpoint") + request);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        assertEquals(response,"already registered");
     }
 
     @Test
     public void testCateringCompanyNewRegistration() {
-        Random rand = new Random();
-        String name = String.valueOf(rand.nextInt(10000));
-        String postCode = String.valueOf(rand.nextInt(10000));
+
+        String name = "ValidCatering";
+        String postCode = "EH8_7NG";
 
         assertTrue(cateringClient.registerCateringCompany(name, postCode));
         assertTrue(cateringClient.isRegistered());
         assertEquals(cateringClient.getName(), name);
+
+        // construct the endpoint request
+        String request = "/registerCateringCompany?business_name=" + name + "&postcode=" + postCode;
+
+        // setup the response recepient
+
+        String response = "";
+
+        try {
+            // perform request
+            response = ClientIO.doGETRequest(clientProps.getProperty("endpoint") + request);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(response,"already registered");
     }
 
     @Test
     public void testSupermarketNewRegistration() {
-        Random rand = new Random();
-        String name = String.valueOf(rand.nextInt(10000));
-        String postCode = String.valueOf(rand.nextInt(10000));
+
+        String name = "ValidSupermarket";
+        String postCode = "EH8_8NG";
 
         assertTrue(supermarketClient.registerSupermarket(name, postCode));
         assertTrue(supermarketClient.isRegistered());
         assertEquals(supermarketClient.getName(), name);
+
+        String request = "/registerSupermarket?business_name=" + name + "&postcode=" + postCode;
+
+        // setup the response recepient
+
+        String response = "";
+
+        try {
+            // perform request
+            response = ClientIO.doGETRequest(clientProps.getProperty("endpoint") + request);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(response,"already registered");
     }
 
     @Test

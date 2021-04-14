@@ -5,8 +5,6 @@
 package shield;
 
 import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Properties;
@@ -14,6 +12,8 @@ import java.time.LocalDateTime;
 import java.io.InputStream;
 
 import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
@@ -48,13 +48,19 @@ public class CateringCompanyClientImpTest {
 
 
   @Test
-  public void testCateringCompanyNewRegistration() {
-    Random rand = new Random();
-    String name = String.valueOf(rand.nextInt(10000));
-    String postCode = String.valueOf(rand.nextInt(10000));
+  public void testCateringCompanyNewRegistrationValidPostcodeFormat() {
+
+    String name = "ValidPostcodeCompany";
+    String postCode = "EH8_7NG";
 
     assertTrue(client.registerCateringCompany(name, postCode));
-    assertTrue(client.isRegistered());
-    assertEquals(client.getName(), name);
+  }
+
+  @Test
+  public void testCateringCompanyNewRegistrationInvalidPostcodeFormat(){
+    String name = "InvalidPostcodeCompany";
+    String postCode = "128_7NG";
+
+    assertFalse(client.registerCateringCompany(name, postCode));
   }
 }

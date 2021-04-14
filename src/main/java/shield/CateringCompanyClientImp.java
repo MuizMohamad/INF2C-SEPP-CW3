@@ -33,7 +33,7 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
       return false;
     }
     // construct the endpoint request
-    String request = "/registerCateringCompany?business_name=" + name + "&postcode=" + postCode + "'";
+    String request = "/registerCateringCompany?business_name=" + name + "&postcode=" + postCode;
 
     // setup the response recepient
 
@@ -60,7 +60,7 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
   @Override
   public boolean updateOrderStatus(int orderNumber, String status) {
     // construct the endpoint request
-    String request = "/updateOrderStatus?order_id=" + orderNumber + "&newStatus=" + status + "'";
+    String request = "/updateOrderStatus?order_id=" + orderNumber + "&newStatus=" + status;
 
     // setup the response recepient
 

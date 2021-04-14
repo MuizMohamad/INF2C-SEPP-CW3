@@ -47,6 +47,11 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     if (!checkCHIFormat(CHI)){
       return false;
     }
+
+    if (isRegistered()){
+      return true;
+    }
+
     // construct the endpoint request
     String request = "/registerShieldingIndividual?CHI=" + CHI ;
 
