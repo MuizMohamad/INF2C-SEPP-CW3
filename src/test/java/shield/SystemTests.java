@@ -136,6 +136,11 @@ public class SystemTests {
 
         String chi = "1001205638";
         assertTrue(individualClient.registerShieldingIndividual(chi));
+        
+        String name = "CateringCompany1";
+        String postCode = "EH10_7PS";
+
+        assertTrue(cateringClient.registerCateringCompany(name, postCode));
 
         ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
         Random rand = new Random();
@@ -145,11 +150,11 @@ public class SystemTests {
         assertTrue(individualClient.placeOrder());
 
         ArrayList<Integer> allOrders = new ArrayList<>(individualClient.getOrderNumbers());
-        assertEquals(allOrders.size(),1);
+        assertEquals(1,allOrders.size());
         int firstOrderNumber = allOrders.get(0);
 
         assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
-        assertEquals(individualClient.getStatusForOrder(firstOrderNumber),"PLACED");
+        assertEquals("PLACED",individualClient.getStatusForOrder(firstOrderNumber));
 
     }
 
@@ -171,6 +176,11 @@ public class SystemTests {
 
         String chi = "2010025348";
         assertTrue(individualClient.registerShieldingIndividual(chi));
+
+        String name = "CateringCompany2";
+        String postCode = "EH16_3NS";
+
+        assertTrue(cateringClient.registerCateringCompany(name, postCode));
 
         ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
         Random rand = new Random();
@@ -202,6 +212,11 @@ public class SystemTests {
 
         String chi = "1009205638";
         assertTrue(individualClient.registerShieldingIndividual(chi));
+
+        String name = "CateringCompany3";
+        String postCode = "EH4_8SD";
+
+        assertTrue(cateringClient.registerCateringCompany(name, postCode));
 
         ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
         Random rand = new Random();

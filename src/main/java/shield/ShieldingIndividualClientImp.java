@@ -68,15 +68,18 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
         }.getType();
         responseRegister = new Gson().fromJson(response, listType);
 
-        this.postcode = responseRegister.get(0);
+        this.postcode = processPostCode(responseRegister.get(0));
         this.name = responseRegister.get(1);
         this.surname = responseRegister.get(2);
         this.phoneNumber = responseRegister.get(3);
+
+        String printTest = "[" + this.postcode + "]";
       }
 
       // unmarshal response
     } catch (Exception e) {
       e.printStackTrace();
+      return false;
     }
 
     this.isRegistered = true;
@@ -133,8 +136,8 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
             "&catering_postcode=" + closestCateringPostCode ;
 
     Gson gson = new Gson();
-    String foodBoxInfoJson = gson.toJson(tempPickedFoodBox.getContents());
-
+    String foodBoxInfoJson = "{\"contents\":"+gson.toJson(tempPickedFoodBox.getContents()) + "}";
+    System.out.println(foodBoxInfoJson);
     int responseOrderID = 0;
 
     try {
@@ -211,7 +214,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public boolean requestOrderStatus(int orderNumber) {
     // construct the endpoint request
-    String request = " /requestStatus?order_id=" + orderNumber;
+    String request = "/requestStatus?order_id=" + orderNumber;
 
     // setup the response recepient
 
@@ -239,7 +242,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public Collection<String> getCateringCompanies() {
     // construct the endpoint request
-    String request = " /getCaterers";
+    String request = "/getCaterers";
 
     // setup the response recepient
 
@@ -248,11 +251,11 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     try {
       // perform request
       String response = ClientIO.doGETRequest(endpoint + request);
-
+      System.out.println(response);
       // unmarshal response
       Type listType = new TypeToken<List<String>>() {} .getType();
       responseCaterers = new Gson().fromJson(response, listType);
-
+      System.out.println(responseCaterers.size());
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -267,7 +270,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
     // construct the endpoint request
     String request = "/distance?postcode1=" + postCode1 + "&postcode2=" + postCode2 ;
-
+    System.out.println(request);
     // setup the response recepient
 
     float responseDistance = 0;
@@ -526,6 +529,14 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return currentClosestCaterer;
   }
 
+  public String getPostcode(){
+    return this.postcode;
+  }
+
+  public void setPostcode(String postcode){
+    this.postcode = postcode;
+  }
+
   private List<FoodBox> getDefaultFoodBoxListFromServer(){
     // construct the endpoint request
     String request = "/showFoodBox?orderOption=catering&dietaryPreference=";
@@ -617,4 +628,8 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return true;
   }
 
+  private String processPostCode(String postcode){
+    String[] splittedPostCode = postcode.split(" ");
+    return splittedPostCode[0] + "_" + splittedPostCode[1];
+  }
 }

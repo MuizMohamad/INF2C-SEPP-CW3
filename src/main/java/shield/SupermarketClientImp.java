@@ -26,6 +26,10 @@ public class SupermarketClientImp implements SupermarketClient {
     if (!checkPostCodeFormat(postCode)){
       return false;
     }
+
+    if (isRegistered()){
+      return true;
+    }
     // construct the endpoint request
     String request = "/registerSupermarket?business_name=" + name + "&postcode=" + postCode;
 
@@ -37,12 +41,9 @@ public class SupermarketClientImp implements SupermarketClient {
       // perform request
       String response = ClientIO.doGETRequest(endpoint + request);
 
-      // unmarshal response
-      responseRegister = new Gson().fromJson(response, String.class);
-
-
     } catch (Exception e) {
       e.printStackTrace();
+      return false;
     }
 
     this.isRegistered = true;
