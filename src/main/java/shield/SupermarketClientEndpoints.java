@@ -20,6 +20,19 @@ public interface SupermarketClientEndpoints {
   */
   public boolean registerSupermarket(String name, String postCode);
 
+  // **UPDATE2** ADDED METHOD
+  /**
+   * Returns true if the operation occurred correctly.
+   *
+   * Note that there is a dedicated server endpoint for implementing this called
+   * recordSupermarketOrder
+   *
+   * @param CHI CHI number of the shiedling individual associated with this order
+   * @param orderNumber the order number
+   * @return true if the operation occurred correctly
+   */
+  public boolean recordSupermarketOrder(String CHI, int orderNumber);
+
   // **UPDATE**
   /**
   * Returns true if the operation occurred correctl

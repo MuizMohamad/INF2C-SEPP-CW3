@@ -33,7 +33,7 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
       return false;
     }
     // construct the endpoint request
-    String request = " /registerCateringCompany?business_name=" + name + "&postcode=" + postCode + "'";
+    String request = "/registerCateringCompany?business_name=" + name + "&postcode=" + postCode + "'";
 
     // setup the response recepient
 
@@ -60,25 +60,25 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
   @Override
   public boolean updateOrderStatus(int orderNumber, String status) {
     // construct the endpoint request
-    String request = " /updateOrderStatus?order_id=" + orderNumber + "&newStatus=" + status + "'";
+    String request = "/updateOrderStatus?order_id=" + orderNumber + "&newStatus=" + status + "'";
 
     // setup the response recepient
 
-    String responseRegister = new String();
+    boolean responseUpdate = false;
 
     try {
       // perform request
       String response = ClientIO.doGETRequest(endpoint + request);
 
-      // unmarshal response
-      responseRegister = new Gson().fromJson(response, String.class);
-
+      if (response.equals("True") || response.equals(("False"))) {
+        responseUpdate = new Gson().fromJson(response, boolean.class);
+      }
 
     } catch (Exception e) {
       e.printStackTrace();
     }
 
-    return true;
+    return responseUpdate;
   }
 
   @Override
