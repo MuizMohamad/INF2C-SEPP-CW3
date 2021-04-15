@@ -240,7 +240,38 @@ public class SystemTests {
     // In general case where the order has not been dispatched, it should be successful
     @Test
     public void testCancelOrder(){
+        String chi = "1001205639";
+        assertTrue(individualClient.registerShieldingIndividual(chi));
 
+        String name = "CateringCompany4";
+        String postCode = "EH10_8PS";
+
+        assertTrue(cateringClient.registerCateringCompany(name, postCode));
+
+        ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
+        Random rand = new Random();
+        int randomId = Integer.parseInt(foodBoxIds.get(rand.nextInt(foodBoxIds.size())));
+        int secondRandomId = Integer.parseInt(foodBoxIds.get(rand.nextInt(foodBoxIds.size())));
+
+        assertTrue(individualClient.pickFoodBox(randomId));
+        assertTrue(individualClient.placeOrder());
+
+        assertTrue(individualClient.pickFoodBox(secondRandomId));
+        assertTrue(individualClient.placeOrder());
+
+        ArrayList<Integer> allOrders = new ArrayList<>(individualClient.getOrderNumbers());
+        assertEquals(2,allOrders.size());
+        int firstOrderNumber = allOrders.get(0);
+        int secondOrderNumber = allOrders.get(1);
+
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PLACED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        //for "PACKED" case
+        // assertTrue(individualClient.requestOrderStatus(secondOrderNumber));
+        // assertEquals("PLACED",individualClient.getStatusForOrder(secondOrderNumber));
+
+        assertTrue(individualClient.cancelOrder(firstOrderNumber));
     }
 
     // In general case where the order has not been packed, it should be successful
