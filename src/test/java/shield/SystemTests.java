@@ -8,13 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Properties;
+import java.util.*;
 import java.time.LocalDateTime;
 import java.io.InputStream;
-
-import java.util.Random;
 
 public class SystemTests {
 
@@ -206,11 +202,10 @@ public class SystemTests {
 
     }
 
-
     @Test
     public void testEditFoodBox(){
 
-        String chi = "1009205638";
+        String chi = "1009205128";
         assertTrue(individualClient.registerShieldingIndividual(chi));
 
         String name = "CateringCompany3";
@@ -228,12 +223,56 @@ public class SystemTests {
         ArrayList<Integer> allOrders = new ArrayList<>(individualClient.getOrderNumbers());
         int firstOrderNumber = allOrders.get(0);
 
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PLACED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        ArrayList<Integer> itemIdsForOrder = new ArrayList<>(individualClient.getItemIdsForOrder(firstOrderNumber));
+        int randomItemId = itemIdsForOrder.get(rand.nextInt(itemIdsForOrder.size()));
+
+        int currentQuantity = individualClient.getItemQuantityForOrder(randomItemId,firstOrderNumber);
+        int changedQuantity = rand.nextInt(currentQuantity);
+
+        assertTrue(individualClient.setItemQuantityForOrder(randomItemId,changedQuantity,firstOrderNumber));
+        assertTrue(individualClient.editOrder(firstOrderNumber));
+
     }
 
     // In general case where the order has been packed, it should fail
     @Test
     public void testEditFooxBoxAfterPacked(){
+        String chi = "1009201438";
+        assertTrue(individualClient.registerShieldingIndividual(chi));
 
+        String name = "CateringCompany3";
+        String postCode = "EH4_8SD";
+
+        assertTrue(cateringClient.registerCateringCompany(name, postCode));
+
+        ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
+        Random rand = new Random();
+        int randomId = Integer.parseInt(foodBoxIds.get(rand.nextInt(foodBoxIds.size())));
+
+        assertTrue(individualClient.pickFoodBox(randomId));
+        assertTrue(individualClient.placeOrder());
+
+        ArrayList<Integer> allOrders = new ArrayList<>(individualClient.getOrderNumbers());
+        int firstOrderNumber = allOrders.get(0);
+
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PLACED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(cateringClient.updateOrderStatus(firstOrderNumber, "packed"));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PACKED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        ArrayList<Integer> itemIdsForOrder = new ArrayList<>(individualClient.getItemIdsForOrder(firstOrderNumber));
+        int randomItemId = itemIdsForOrder.get(rand.nextInt(itemIdsForOrder.size()));
+
+        int currentQuantity = individualClient.getItemQuantityForOrder(randomItemId,firstOrderNumber);
+        int changedQuantity = rand.nextInt(currentQuantity);
+
+        assertTrue(individualClient.setItemQuantityForOrder(randomItemId,changedQuantity,firstOrderNumber));
+        assertFalse(individualClient.editOrder(firstOrderNumber));
     }
 
 
@@ -343,7 +382,64 @@ public class SystemTests {
     // by updating the order status on specific value and check if the requested status is the same
     @Test
     public void testRequestOrderStatus(){
+        String chi = "1001205643";
+        assertTrue(individualClient.registerShieldingIndividual(chi));
 
+        String name = "CateringCompany8";
+        String postCode = "EH13_9PS";
+
+        assertTrue(cateringClient.registerCateringCompany(name, postCode));
+
+        ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
+        Random rand = new Random();
+        int randomId = Integer.parseInt(foodBoxIds.get(rand.nextInt(foodBoxIds.size())));
+
+        assertTrue(individualClient.pickFoodBox(randomId));
+        assertTrue(individualClient.placeOrder());
+
+        ArrayList<Integer> allOrders = new ArrayList<>(individualClient.getOrderNumbers());
+        assertEquals(1,allOrders.size());
+        int firstOrderNumber = allOrders.get(0);
+
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PLACED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(updateOrderEndpoint(firstOrderNumber, "packed"));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PACKED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(updateOrderEndpoint(firstOrderNumber, "dispatched"));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("DISPATCHED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(updateOrderEndpoint(firstOrderNumber, "delivered"));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("DELIVERED",individualClient.getStatusForOrder(firstOrderNumber));
+
+
+    }
+
+    private boolean updateOrderEndpoint(int orderNumber, String status){
+        // construct the endpoint request
+        String request = "/updateOrderStatus?order_id=" + orderNumber + "&newStatus=" + status;
+
+        // setup the response recepient
+
+        boolean responseUpdate = false;
+
+        try {
+            // perform request
+            String response = ClientIO.doGETRequest(clientProps.getProperty("endpoint") + request);
+
+            if (response.equals("True") || response.equals(("False"))) {
+                responseUpdate = new Gson().fromJson(response, boolean.class);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return responseUpdate;
     }
 
     // Test that update order status will update the server correctly
@@ -369,19 +465,46 @@ public class SystemTests {
         assertEquals(1,allOrders.size());
         int firstOrderNumber = allOrders.get(0);
 
-        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
-        assertEquals("PLACED",individualClient.getStatusForOrder(firstOrderNumber));
+        assertEquals("PLACED",requestOrderEndpoint(firstOrderNumber));
 
         assertTrue(cateringClient.updateOrderStatus(firstOrderNumber, "packed"));
-        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
-        assertEquals("PACKED",individualClient.getStatusForOrder(firstOrderNumber));
+        assertEquals("PACKED",requestOrderEndpoint(firstOrderNumber));
 
         assertTrue(cateringClient.updateOrderStatus(firstOrderNumber, "dispatched"));
-        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
-        assertEquals("DISPATCHED",individualClient.getStatusForOrder(firstOrderNumber));
+        assertEquals("DISPATCHED",requestOrderEndpoint(firstOrderNumber));
 
         assertTrue(cateringClient.updateOrderStatus(firstOrderNumber, "delivered"));
-        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
-        assertEquals("DELIVERED",individualClient.getStatusForOrder(firstOrderNumber));
+        assertEquals("DELIVERED",requestOrderEndpoint(firstOrderNumber));
+    }
+
+    private String requestOrderEndpoint(int orderNumber){
+        // construct the endpoint request
+        String request = "/requestStatus?order_id=" + orderNumber;
+
+        // setup the response recepient
+        String response;
+
+        try {
+            // perform request
+            response = ClientIO.doGETRequest(clientProps.getProperty("endpoint") + request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "FAILED";
+        }
+
+        switch (response) {
+            case "0" :
+                return "PLACED";
+            case "1" :
+                return "PACKED";
+            case "2" :
+                return "DISPATCHED";
+            case "3":
+                return "DELIVERED";
+            case "4" :
+                return "CANCELLED";
+            default :
+                return "NOT EXIST";
+        }
     }
 }

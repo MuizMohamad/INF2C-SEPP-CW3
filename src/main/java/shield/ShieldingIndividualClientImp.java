@@ -170,9 +170,17 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     if (!orderStatus.equals("PLACED")){
       return false;
     }
+
+    Order placedOrder = getOrdersOrderNumber(orderNumber);
+
+    FoodBox editedFoodBox = placedOrder.getOrderedFoodBox();
+    Gson gson = new Gson();
+    String foodBoxInfoJson = "{\"contents\":"+gson.toJson(editedFoodBox.getContents()) + "}";
+    System.out.println(foodBoxInfoJson);
+
     try {
       // perform request
-      String response = ClientIO.doGETRequest(endpoint + request);
+      String response = ClientIO.doPOSTRequest(endpoint + request,foodBoxInfoJson);
 
       // unmarshal response
 
@@ -218,22 +226,18 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
     // setup the response recepient
 
-    String responseRegister;
+    String response;
 
     try {
       // perform request
-      String response = ClientIO.doGETRequest(endpoint + request);
-
-      // unmarshal response
-      responseRegister = new Gson().fromJson(response, String.class);
-
+      response = ClientIO.doGETRequest(endpoint + request);
 
     } catch (Exception e) {
       e.printStackTrace();
       return false;
     }
 
-    Objects.requireNonNull(getOrdersOrderNumber(orderNumber)).setOrderStatus(responseRegister);
+    Objects.requireNonNull(getOrdersOrderNumber(orderNumber)).setOrderStatus(response);
 
     return true;
   }
