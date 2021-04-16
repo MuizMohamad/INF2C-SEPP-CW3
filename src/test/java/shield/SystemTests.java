@@ -240,19 +240,103 @@ public class SystemTests {
     // In general case where the order has not been dispatched, it should be successful
     @Test
     public void testCancelOrder(){
+        String chi = "1001205639";
+        assertTrue(individualClient.registerShieldingIndividual(chi));
 
+        String name = "CateringCompany4";
+        String postCode = "EH10_8PS";
+
+        assertTrue(cateringClient.registerCateringCompany(name, postCode));
+
+        ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
+        Random rand = new Random();
+        int randomId = Integer.parseInt(foodBoxIds.get(rand.nextInt(foodBoxIds.size())));
+
+        assertTrue(individualClient.pickFoodBox(randomId));
+        assertTrue(individualClient.placeOrder());
+
+        ArrayList<Integer> allOrders = new ArrayList<>(individualClient.getOrderNumbers());
+        assertEquals(1,allOrders.size());
+        int firstOrderNumber = allOrders.get(0);
+
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PLACED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(individualClient.cancelOrder(firstOrderNumber));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("CANCELLED",individualClient.getStatusForOrder(firstOrderNumber));
     }
 
     // In general case where the order has not been packed, it should be successful
     @Test
     public void testCancelOrderPacked(){
+        String chi = "1001205640";
+        assertTrue(individualClient.registerShieldingIndividual(chi));
 
+        String name = "CateringCompany5";
+        String postCode = "EH10_9PS";
+
+        assertTrue(cateringClient.registerCateringCompany(name, postCode));
+
+        ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
+        Random rand = new Random();
+        int randomId = Integer.parseInt(foodBoxIds.get(rand.nextInt(foodBoxIds.size())));
+
+        assertTrue(individualClient.pickFoodBox(randomId));
+        assertTrue(individualClient.placeOrder());
+
+        ArrayList<Integer> allOrders = new ArrayList<>(individualClient.getOrderNumbers());
+        assertEquals(1,allOrders.size());
+        int firstOrderNumber = allOrders.get(0);
+
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PLACED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(cateringClient.updateOrderStatus(firstOrderNumber, "packed"));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PACKED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(individualClient.cancelOrder(firstOrderNumber));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("CANCELLED",individualClient.getStatusForOrder(firstOrderNumber));
     }
 
     // Order cancel should failed if it is cancelled after dispatched
     @Test
     public void testCancelOrderAfterDispatched(){
+        String chi = "1001205641";
+        assertTrue(individualClient.registerShieldingIndividual(chi));
 
+        String name = "CateringCompany6";
+        String postCode = "EH11_9PS";
+
+        assertTrue(cateringClient.registerCateringCompany(name, postCode));
+
+        ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
+        Random rand = new Random();
+        int randomId = Integer.parseInt(foodBoxIds.get(rand.nextInt(foodBoxIds.size())));
+
+        assertTrue(individualClient.pickFoodBox(randomId));
+        assertTrue(individualClient.placeOrder());
+
+        ArrayList<Integer> allOrders = new ArrayList<>(individualClient.getOrderNumbers());
+        assertEquals(1,allOrders.size());
+        int firstOrderNumber = allOrders.get(0);
+
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PLACED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(cateringClient.updateOrderStatus(firstOrderNumber, "packed"));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PACKED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(cateringClient.updateOrderStatus(firstOrderNumber, "dispatched"));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("DISPATCHED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertFalse(individualClient.cancelOrder(firstOrderNumber));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("DISPATCHED",individualClient.getStatusForOrder(firstOrderNumber));
     }
 
     // Test that the request order status give the correct order status,
@@ -266,6 +350,38 @@ public class SystemTests {
     // and also when we request the status, it will be the same status as the updated one.
     @Test
     public void testUpdateOrderStatus(){
+        String chi = "1001205643";
+        assertTrue(individualClient.registerShieldingIndividual(chi));
 
+        String name = "CateringCompany8";
+        String postCode = "EH13_9PS";
+
+        assertTrue(cateringClient.registerCateringCompany(name, postCode));
+
+        ArrayList<String> foodBoxIds = new ArrayList<>(individualClient.showFoodBoxes("none"));
+        Random rand = new Random();
+        int randomId = Integer.parseInt(foodBoxIds.get(rand.nextInt(foodBoxIds.size())));
+
+        assertTrue(individualClient.pickFoodBox(randomId));
+        assertTrue(individualClient.placeOrder());
+
+        ArrayList<Integer> allOrders = new ArrayList<>(individualClient.getOrderNumbers());
+        assertEquals(1,allOrders.size());
+        int firstOrderNumber = allOrders.get(0);
+
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PLACED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(cateringClient.updateOrderStatus(firstOrderNumber, "packed"));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("PACKED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(cateringClient.updateOrderStatus(firstOrderNumber, "dispatched"));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("DISPATCHED",individualClient.getStatusForOrder(firstOrderNumber));
+
+        assertTrue(cateringClient.updateOrderStatus(firstOrderNumber, "delivered"));
+        assertTrue(individualClient.requestOrderStatus(firstOrderNumber));
+        assertEquals("DELIVERED",individualClient.getStatusForOrder(firstOrderNumber));
     }
 }
