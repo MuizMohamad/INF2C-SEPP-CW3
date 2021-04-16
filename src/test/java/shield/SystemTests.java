@@ -136,7 +136,7 @@ public class SystemTests {
 
         String chi = "1001205638";
         assertTrue(individualClient.registerShieldingIndividual(chi));
-        
+
         String name = "CateringCompany1";
         String postCode = "EH10_7PS";
 
