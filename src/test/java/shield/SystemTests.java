@@ -507,4 +507,11 @@ public class SystemTests {
                 return "NOT EXIST";
         }
     }
+
+    @Test
+    public void testGetClosestCateringCompany(){
+        // register a few company with specific postcode (USE HTTP REQUEST DIRECTLY)
+        // register individual with and change the postcode to something specific (USE CLIENT FUNCTION and SETTER)
+        // check if the the closest catering company is true
+    }
 }

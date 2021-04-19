@@ -236,7 +236,9 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
       e.printStackTrace();
       return false;
     }
-
+    if (response.equals("-1")){
+      return false;
+    }
     Objects.requireNonNull(getOrdersOrderNumber(orderNumber)).setOrderStatus(response);
 
     return true;
@@ -272,6 +274,9 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   @Override
   public float getDistance(String postCode1, String postCode2) {
 
+    if (!checkPostCodeFormat(postCode1) || !checkPostCodeFormat(postCode2)){
+      return 0;
+    }
     // construct the endpoint request
     String request = "/distance?postcode1=" + postCode1 + "&postcode2=" + postCode2 ;
     System.out.println(request);
@@ -305,6 +310,11 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   }
 
   @Override
+  public void setDefaultFoodBoxList(ArrayList<FoodBox> defaultFoodBoxList){
+    this.defaultFoodBoxList = defaultFoodBoxList;
+  }
+
+  @Override
   public int getFoodBoxNumber() {
     return defaultFoodBoxList.size();
   }
@@ -323,8 +333,6 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     assert foundFoodBox != null;
     return foundFoodBox.getContents().size();
   }
-
-
 
   @Override
   public Collection<Integer> getItemIdsForFoodBox(int foodboxId) {
@@ -380,6 +388,10 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return null;
   }
 
+  @Override
+  public FoodBox getPickedFoodBox(){
+    return tempPickedFoodBox;
+  }
 
   @Override
   public boolean pickFoodBox(int foodBoxId) {
@@ -398,6 +410,11 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     }
 
     return true;
+  }
+
+  @Override
+  public void setOrderHistory(ArrayList<Order> orderHistory){
+    this.orderHistory = orderHistory;
   }
 
   @Override
@@ -506,6 +523,16 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return true;
   }
 
+  @Override
+  public String getPostcode(){
+    return this.postcode;
+  }
+
+  @Override
+  public void setPostcode(String postcode){
+    this.postcode = postcode;
+  }
+
   // **UPDATE**
   @Override
   public String getClosestCateringCompany() {
@@ -531,14 +558,6 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
 
     return currentClosestCaterer;
-  }
-
-  public String getPostcode(){
-    return this.postcode;
-  }
-
-  public void setPostcode(String postcode){
-    this.postcode = postcode;
   }
 
   private List<FoodBox> getDefaultFoodBoxListFromServer(){
@@ -635,5 +654,16 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   private String processPostCode(String postcode){
     String[] splittedPostCode = postcode.split(" ");
     return splittedPostCode[0] + "_" + splittedPostCode[1];
+  }
+
+  private boolean checkPostCodeFormat(String postCode){
+
+    String regex = "EH([1-9]|1[0-7])_[1-9][A-Z][A-Z]";
+    Pattern format = Pattern.compile(regex);
+    Matcher mt = format.matcher(postCode);
+
+    boolean result = mt.matches();
+
+    return result;
   }
 }

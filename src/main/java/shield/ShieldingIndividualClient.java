@@ -7,6 +7,7 @@
 
 package shield;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public interface ShieldingIndividualClient extends ShieldingIndividualClientEndpoints {
@@ -197,4 +198,38 @@ public interface ShieldingIndividualClient extends ShieldingIndividualClientEndp
    * @return business name of catering company
   */
   public String getClosestCateringCompany();
+
+  /**
+   * Setter method for default food box list
+   * for testing
+   */
+  public void setDefaultFoodBoxList(ArrayList<FoodBox> newFoodBoxList);
+
+  /**
+   * Getter method for picked food box
+   * for testing
+   *
+   * @return picked food box
+   */
+  public FoodBox getPickedFoodBox();
+
+  /**
+   * Setter for order history list
+   * for testing
+   */
+  public void setOrderHistory(ArrayList<Order> orderHistory);
+
+  /**
+   * Getter for individual postcode
+   * for testing
+   *
+   * @return postcode attribute of the individual
+   */
+  public String getPostcode();
+
+  /**
+   * Setter for individual postcode
+   * for testing
+   */
+  public void setPostcode(String postcode);
 }

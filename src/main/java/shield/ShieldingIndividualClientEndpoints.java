@@ -10,6 +10,7 @@
 
 package shield;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.time.LocalDateTime;
 
@@ -89,4 +90,5 @@ public interface ShieldingIndividualClientEndpoints {
   * @return the distance as a float between the two locations
   */
   public float getDistance(String postCode1, String postCode2);
+
 }
