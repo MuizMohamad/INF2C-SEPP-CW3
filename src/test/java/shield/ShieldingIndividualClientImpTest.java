@@ -25,6 +25,7 @@ public class ShieldingIndividualClientImpTest {
 
   private Properties clientProps;
   private ShieldingIndividualClient client;
+  private CateringCompanyClient catering;
 
   private Properties loadProperties(String propsFilename) {
     ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -118,6 +119,24 @@ public class ShieldingIndividualClientImpTest {
   public void testGetCateringCompanies(){
     // register a few company directly through http request
     // use method to get list and then check
+    String company1 = "Company1";
+    String postcode1 = "EH8_9PS";
+
+    String company2 = "Company2";
+    String postcode2 = "EH6_9PS";
+
+    String company3 = "Company3";
+    String postcode3 = "EH7_9PS";
+
+    catering.registerCateringCompany(company1, postcode1);
+    catering.registerCateringCompany(company2, postcode2);
+    catering.registerCateringCompany(company3, postcode3);
+
+    client.getCateringCompanies();
+
+    ///////////////////////////////////////////////////////////////
+    // x siap lagi
+
   }
 
   @Test
@@ -324,11 +343,11 @@ public class ShieldingIndividualClientImpTest {
 
     FoodItem foodItem2 = new FoodItem();
     foodItem2.setId(4);
-    foodItem1.setQuantity(16);
+    foodItem2.setQuantity(16);
 
     FoodItem foodItem3 = new FoodItem();
     foodItem3.setId(6);
-    foodItem1.setQuantity(1);
+    foodItem3.setQuantity(1);
 
     test_contents.add(foodItem1);
     test_contents.add(foodItem2);
@@ -352,46 +371,278 @@ public class ShieldingIndividualClientImpTest {
     // check if pickFoodBox is the same
     ArrayList<FoodBox> testFoodBoxList = new ArrayList<>();
 
+    ///////////////////////////////////////////////////////////////
+    // x siap lagi
 
   }
 
   @Test
   public void testChangeItemQuantityForPickedFoodBox(){
     // check if the item quantity does changed
+    ArrayList<FoodBox> testFoodBoxList = new ArrayList<>();
+
+    // Foodbox 1
+    FoodBox foodBox1 = new FoodBox();
+    foodBox1.setDiet("vegan");
+    foodBox1.setId("120");
+
+    List<FoodItem> test_contents = new ArrayList<>();
+
+    FoodItem foodItem1 = new FoodItem();
+    foodItem1.setId(3);
+    foodItem1.setQuantity(9);
+
+    FoodItem foodItem2 = new FoodItem();
+    foodItem2.setId(4);
+    foodItem2.setQuantity(16);
+
+    FoodItem foodItem3 = new FoodItem();
+    foodItem3.setId(6);
+    foodItem3.setQuantity(1);
+
+    test_contents.add(foodItem1);
+    test_contents.add(foodItem2);
+    test_contents.add(foodItem3);
+
+    foodBox1.setContents(test_contents);
+
+    testFoodBoxList.add(foodBox1);
+
+    client.setDefaultFoodBoxList(testFoodBoxList);
+
+    client.pickFoodBox(120);
+
+    assertEquals(9, client.getItemQuantityForFoodBox(3,120));
+    assertEquals(16, client.getItemQuantityForFoodBox(4,120));
+    assertEquals(1, client.getItemQuantityForFoodBox(6,120));
+
+    client.changeItemQuantityForPickedFoodBox(3, 10);
+    client.changeItemQuantityForPickedFoodBox(4, 11);
+    client.changeItemQuantityForPickedFoodBox(6, 3);
+
+    assertEquals(10, client.getItemQuantityForFoodBox(3,120));
+    assertEquals(11, client.getItemQuantityForFoodBox(4,120));
+    assertEquals(3, client.getItemQuantityForFoodBox(6,120));
   }
 
   @Test
   public void testGetOrderNumbers(){
     // create a order history list and use setter
     // test if same number of order
+    FoodBox foodBox1 = new FoodBox();
+    foodBox1.setDiet("vegan");
+    foodBox1.setId("120");
+
+    FoodBox foodBox2 = new FoodBox();
+    foodBox2.setDiet("vegan");
+    foodBox2.setId("121");
+
+    FoodBox foodBox3 = new FoodBox();
+    foodBox3.setDiet("vegan");
+    foodBox3.setId("122");
+
+    ArrayList<Order> orderHistory = new ArrayList<>();
+
+    Order placedOrder1 = new Order(foodBox1,"0",1);
+    orderHistory.add(placedOrder1);
+    Order placedOrder2 = new Order(foodBox2,"0",2);
+    orderHistory.add(placedOrder2);
+    Order placedOrder3 = new Order(foodBox3,"0",3);
+    orderHistory.add(placedOrder3);
+
+    client.setOrderHistory(orderHistory);
+
+    ///////////////////////////////////////////////////////////////
+    // x siap lagi
+
   }
 
   @Test
   public void testGetStatusForOrder(){
     // test if order has same status as created
+    FoodBox foodBox1 = new FoodBox();
+    foodBox1.setDiet("vegan");
+    foodBox1.setId("120");
+
+    ArrayList<Order> orderHistory = new ArrayList<>();
+
+    Order placedOrder1 = new Order(foodBox1,"0",1);
+    orderHistory.add(placedOrder1);
+    Order placedOrder2 = new Order(foodBox1,"1",2);
+    orderHistory.add(placedOrder2);
+    Order placedOrder3 = new Order(foodBox1,"2",3);
+    orderHistory.add(placedOrder3);
+    Order placedOrder4 = new Order(foodBox1,"3",4);
+    orderHistory.add(placedOrder4);
+    Order placedOrder5 = new Order(foodBox1,"4",5);
+    orderHistory.add(placedOrder5);
+
+    client.setOrderHistory(orderHistory);
+
+    assertEquals("PLACED", client.getStatusForOrder(1));
+    assertEquals("PACKED", client.getStatusForOrder(2));
+    assertEquals("DISPATCHED", client.getStatusForOrder(3));
+    assertEquals("DELIVERED", client.getStatusForOrder(4));
+    assertEquals("CANCELLED", client.getStatusForOrder(5));
   }
 
   @Test
   public void testGetItemIdsForOrder(){
     // test same item ids as created object
+    FoodBox foodBox1 = new FoodBox();
+    foodBox1.setDiet("vegan");
+    foodBox1.setId("120");
+
+    List<FoodItem> test_contents = new ArrayList<>();
+
+    FoodItem foodItem1 = new FoodItem();
+    foodItem1.setId(3);
+
+    FoodItem foodItem2 = new FoodItem();
+    foodItem2.setId(4);
+
+    FoodItem foodItem3 = new FoodItem();
+    foodItem3.setId(6);
+
+    test_contents.add(foodItem1);
+    test_contents.add(foodItem2);
+    test_contents.add(foodItem3);
+
+    foodBox1.setContents(test_contents);
+
+    ArrayList<Order> orderHistory = new ArrayList<>();
+
+    Order placedOrder1 = new Order(foodBox1,"0",1);
+    orderHistory.add(placedOrder1);
+
+    client.setOrderHistory(orderHistory);
+
+    List<Integer> itemIDS = List.of(3, 4, 6);
+    assertEquals(itemIDS, client.getItemIdsForOrder(1));
   }
 
   @Test
   public void testGetItemNameForOrder(){
-    // check if item name same as order
+    FoodBox foodBox1 = new FoodBox();
+    foodBox1.setDiet("vegan");
+    foodBox1.setId("120");
+
+    List<FoodItem> test_contents = new ArrayList<>();
+
+    FoodItem foodItem1 = new FoodItem();
+    foodItem1.setId(3);
+    foodItem1.setName("Name1");
+
+    FoodItem foodItem2 = new FoodItem();
+    foodItem2.setId(4);
+    foodItem2.setName("Name2");
+
+    FoodItem foodItem3 = new FoodItem();
+    foodItem3.setId(6);
+    foodItem3.setName("Name3");
+
+    test_contents.add(foodItem1);
+    test_contents.add(foodItem2);
+    test_contents.add(foodItem3);
+
+    foodBox1.setContents(test_contents);
+
+    ArrayList<Order> orderHistory = new ArrayList<>();
+
+    Order placedOrder1 = new Order(foodBox1,"0",1);
+    orderHistory.add(placedOrder1);
+
+    client.setOrderHistory(orderHistory);
+
+    assertEquals("Name1", client.getItemNameForOrder(3, 1));
+    assertEquals("Name2", client.getItemNameForOrder(4, 1));
+    assertEquals("Name3", client.getItemNameForOrder(6, 1));
   }
 
   @Test
   public void testGetItemQuantityForOrder(){
     // check if item quantity same for order
+    FoodBox foodBox1 = new FoodBox();
+    foodBox1.setDiet("vegan");
+    foodBox1.setId("120");
+
+    List<FoodItem> test_contents = new ArrayList<>();
+
+    FoodItem foodItem1 = new FoodItem();
+    foodItem1.setId(3);
+    foodItem1.setQuantity(9);
+
+    FoodItem foodItem2 = new FoodItem();
+    foodItem2.setId(4);
+    foodItem2.setQuantity(16);
+
+    FoodItem foodItem3 = new FoodItem();
+    foodItem3.setId(6);
+    foodItem3.setQuantity(1);
+
+    test_contents.add(foodItem1);
+    test_contents.add(foodItem2);
+    test_contents.add(foodItem3);
+
+    foodBox1.setContents(test_contents);
+
+    ArrayList<Order> orderHistory = new ArrayList<>();
+
+    Order placedOrder1 = new Order(foodBox1,"0",1);
+    orderHistory.add(placedOrder1);
+
+    client.setOrderHistory(orderHistory);
+
+    assertEquals(9, client.getItemQuantityForOrder(3, 1));
+    assertEquals(16, client.getItemQuantityForOrder(4, 1));
+    assertEquals(1, client.getItemQuantityForOrder(6, 1));
   }
 
   @Test
   public void testSetItemQuantityForOrder(){
     // check if item quantity is same as changed
+    FoodBox foodBox1 = new FoodBox();
+    foodBox1.setDiet("vegan");
+    foodBox1.setId("120");
+
+    List<FoodItem> test_contents = new ArrayList<>();
+
+    FoodItem foodItem1 = new FoodItem();
+    foodItem1.setId(3);
+    foodItem1.setQuantity(9);
+
+    FoodItem foodItem2 = new FoodItem();
+    foodItem2.setId(4);
+    foodItem2.setQuantity(16);
+
+    FoodItem foodItem3 = new FoodItem();
+    foodItem3.setId(6);
+    foodItem3.setQuantity(1);
+
+    test_contents.add(foodItem1);
+    test_contents.add(foodItem2);
+    test_contents.add(foodItem3);
+
+    foodBox1.setContents(test_contents);
+
+    ArrayList<Order> orderHistory = new ArrayList<>();
+
+    Order placedOrder1 = new Order(foodBox1,"0",1);
+    orderHistory.add(placedOrder1);
+
+    client.setOrderHistory(orderHistory);
+
+    assertEquals(9, client.getItemQuantityForOrder(3, 1));
+    assertEquals(16, client.getItemQuantityForOrder(4, 1));
+    assertEquals(1, client.getItemQuantityForOrder(6, 1));
+
+    client.setItemQuantityForOrder(3, 1, 7);
+    client.setItemQuantityForOrder(4, 1, 16);
+    client.setItemQuantityForOrder(6, 1, 5);
+
+    assertEquals(7, client.getItemQuantityForOrder(3, 1));
+    assertEquals(16, client.getItemQuantityForOrder(4, 1));
+    assertEquals(1, client.getItemQuantityForOrder(6, 1));
   }
-
-
-
 
 }
