@@ -510,6 +510,9 @@ public class SystemTests {
 
     @Test
     public void testGetClosestCateringCompany(){
+
+        // TODO test get closest catering company
+
         // register a few company with specific postcode (USE HTTP REQUEST DIRECTLY)
         // register individual with and change the postcode to something specific (USE CLIENT FUNCTION and SETTER)
         // check if the the closest catering company is true

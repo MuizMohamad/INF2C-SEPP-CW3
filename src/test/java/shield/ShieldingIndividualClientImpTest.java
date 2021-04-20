@@ -10,7 +10,6 @@ import org.junit.jupiter.api.*;
 
 import java.lang.reflect.Type;
 import java.util.*;
-import java.time.LocalDateTime;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -117,6 +116,9 @@ public class ShieldingIndividualClientImpTest {
 
   @Test
   public void testGetCateringCompanies(){
+
+    //TODO request directly with server
+
     // register a few company directly through http request
     // use method to get list and then check
     String company1 = "Company1";
