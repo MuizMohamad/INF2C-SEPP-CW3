@@ -261,7 +261,6 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
       // unmarshal response
       Type listType = new TypeToken<List<String>>() {} .getType();
       responseCaterers = new Gson().fromJson(response, listType);
-      System.out.println(responseCaterers.size());
 
     } catch (Exception e) {
       e.printStackTrace();

@@ -132,11 +132,53 @@ public class ShieldingIndividualClientImpTest {
     catering.registerCateringCompany(company2, postcode2);
     catering.registerCateringCompany(company3, postcode3);
 
-    client.getCateringCompanies();
+    ArrayList<ArrayList<String>> expected = processCatererList(client.getCateringCompanies());
 
-    ///////////////////////////////////////////////////////////////
-    // x siap lagi
+    ArrayList<ArrayList<String>> answer = new ArrayList<>();
 
+    ArrayList<String> infoCateringCompany1 = new ArrayList<>();
+    infoCateringCompany1.add(company1);
+    infoCateringCompany1.add(postcode1);
+
+    ArrayList<String> infoCateringCompany2 = new ArrayList<>();
+    infoCateringCompany2.add(company2);
+    infoCateringCompany2.add(postcode2);
+
+    ArrayList<String> infoCateringCompany3 = new ArrayList<>();
+    infoCateringCompany3.add(company3);
+    infoCateringCompany3.add(postcode3);
+
+    answer.add(infoCateringCompany1);
+    answer.add(infoCateringCompany2);
+    answer.add(infoCateringCompany3);
+
+    assertEquals(answer,expected);
+
+  }
+
+  private ArrayList<ArrayList<String>> processCatererList(Collection<String> caterersInfo) {
+
+    ArrayList<String> caterersList = new ArrayList<>(caterersInfo);
+
+    caterersList.remove("");
+
+    ArrayList<ArrayList<String>> processedList = new ArrayList<>();
+
+    for (String caterer : caterersList) {
+      String[] catererInfo = caterer.split(",");
+
+      // 0th element is nth caterer which might be useless
+      String catererName = catererInfo[1];
+      String catererPostCode = catererInfo[2];
+
+      ArrayList<String> infos = new ArrayList<>();
+      infos.add(catererName);
+      infos.add(catererPostCode);
+
+      processedList.add(infos);
+    }
+
+    return processedList;
   }
 
   @Test
@@ -368,11 +410,37 @@ public class ShieldingIndividualClientImpTest {
   @Test
   public void testPickFoodBox(){
 
-    // check if pickFoodBox is the same
-    ArrayList<FoodBox> testFoodBoxList = new ArrayList<>();
+    // construct the endpoint request
+    String request = "/showFoodBox?orderOption=catering&dietaryPreference='";
 
-    ///////////////////////////////////////////////////////////////
-    // x siap lagi
+    // setup the response recepient
+    List<FoodBox> responseBoxes = new ArrayList<FoodBox>();
+
+    ArrayList<Integer> boxIds = new ArrayList<>();
+
+    try {
+      // perform request
+      String response = ClientIO.doGETRequest(clientProps.getProperty("endpoint") + request);
+
+      // unmarshal response
+      Type listType = new TypeToken<List<FoodBox>>() {} .getType();
+      responseBoxes = new Gson().fromJson(response, listType);
+
+      // gather required fields
+      for (FoodBox b : responseBoxes) {
+        boxIds.add(Integer.parseInt(b.getFoodBoxID()));
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    Random rand = new Random();
+    int randomId = boxIds.get(rand.nextInt(boxIds.size()));
+
+    client.pickFoodBox(randomId);
+
+    assertEquals(randomId,Integer.parseInt(client.getPickedFoodBox().getFoodBoxID()));
 
   }
 
@@ -452,8 +520,7 @@ public class ShieldingIndividualClientImpTest {
 
     client.setOrderHistory(orderHistory);
 
-    ///////////////////////////////////////////////////////////////
-    // x siap lagi
+    assertEquals(3,client.getOrderNumbers());
 
   }
 

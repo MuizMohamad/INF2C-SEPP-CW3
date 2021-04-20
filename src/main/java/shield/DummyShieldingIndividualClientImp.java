@@ -93,6 +93,23 @@ public class DummyShieldingIndividualClientImp implements ShieldingIndividualCli
     return false;
   }
 
+  @Override
+  public void setDefaultFoodBoxList(ArrayList<FoodBox> newFoodBoxList){
+
+  };
+
+  @Override
+  public FoodBox getPickedFoodBox(){return new FoodBox();}
+
+  @Override
+  public void setOrderHistory(ArrayList<Order> orderHistory){}
+
+  @Override
+  public String getPostcode(){return ""; }
+
+  @Override
+  public void setPostcode(String postcode){}
+
   // **UPDATE**
   @Override
   public Collection<String> getCateringCompanies() {
