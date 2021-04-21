@@ -272,7 +272,8 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   // **UPDATE**
   @Override
   public float getDistance(String postCode1, String postCode2) {
-
+    Objects.requireNonNull(postCode1);
+    Objects.requireNonNull(postCode2);
     if (!checkPostCodeFormat(postCode1) || !checkPostCodeFormat(postCode2)){
       return 0;
     }

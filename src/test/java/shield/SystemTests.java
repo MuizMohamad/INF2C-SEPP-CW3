@@ -382,11 +382,12 @@ public class SystemTests {
     // by updating the order status on specific value and check if the requested status is the same
     @Test
     public void testRequestOrderStatus(){
-        String chi = "1001205643";
+
+        String chi = "1010805643";
         assertTrue(individualClient.registerShieldingIndividual(chi));
 
         String name = "CateringCompany8";
-        String postCode = "EH13_9PS";
+        String postCode = "EH13_5PS";
 
         assertTrue(cateringClient.registerCateringCompany(name, postCode));
 
@@ -449,7 +450,7 @@ public class SystemTests {
         String chi = "1001205643";
         assertTrue(individualClient.registerShieldingIndividual(chi));
 
-        String name = "CateringCompany8";
+        String name = "CateringCompany9";
         String postCode = "EH13_9PS";
 
         assertTrue(cateringClient.registerCateringCompany(name, postCode));
@@ -510,8 +511,6 @@ public class SystemTests {
 
     @Test
     public void testGetClosestCateringCompany(){
-
-        // TODO test get closest catering company
 
         // register a few company with specific postcode (USE HTTP REQUEST DIRECTLY)
         // register individual with and change the postcode to something specific (USE CLIENT FUNCTION and SETTER)

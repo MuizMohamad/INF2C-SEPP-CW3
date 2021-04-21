@@ -117,18 +117,16 @@ public class ShieldingIndividualClientImpTest {
   @Test
   public void testGetCateringCompanies(){
 
-    //TODO request directly with server
-
     // register a few company directly through http request
     // use method to get list and then check
-    String company1 = "Company1";
-    String postcode1 = "EH8_9PS";
+    String company1 = "TestCC1";
+    String postcode1 = "EH1_3PN";
 
-    String company2 = "Company2";
-    String postcode2 = "EH6_9PS";
+    String company2 = "TestCC2";
+    String postcode2 = "EH2_3PN";
 
-    String company3 = "Company3";
-    String postcode3 = "EH7_9PS";
+    String company3 = "TestCC3";
+    String postcode3 = "EH3_3PN";
 
     assertEquals("registered new", registerCateringCompanyEndpoint(company1, postcode1));
     assertEquals("registered new", registerCateringCompanyEndpoint(company2, postcode2));
@@ -540,7 +538,14 @@ public class ShieldingIndividualClientImpTest {
 
     client.setOrderHistory(orderHistory);
 
-    assertEquals(3,client.getOrderNumbers());
+    ArrayList<Integer> expected = new ArrayList<>();
+
+    expected.add(1);
+    expected.add(2);
+    expected.add(3);
+
+    assertEquals(3,client.getOrderNumbers().size());
+    assertEquals(expected,client.getOrderNumbers());
 
   }
 
