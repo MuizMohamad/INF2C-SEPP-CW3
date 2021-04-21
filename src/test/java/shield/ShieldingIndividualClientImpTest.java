@@ -130,9 +130,9 @@ public class ShieldingIndividualClientImpTest {
     String company3 = "Company3";
     String postcode3 = "EH7_9PS";
 
-    catering.registerCateringCompany(company1, postcode1);
-    catering.registerCateringCompany(company2, postcode2);
-    catering.registerCateringCompany(company3, postcode3);
+    assertEquals("registered new", registerCateringCompanyEndpoint(company1, postcode1));
+    assertEquals("registered new", registerCateringCompanyEndpoint(company2, postcode2));
+    assertEquals("registered new", registerCateringCompanyEndpoint(company3, postcode3));
 
     ArrayList<ArrayList<String>> expected = processCatererList(client.getCateringCompanies());
 
@@ -155,7 +155,25 @@ public class ShieldingIndividualClientImpTest {
     answer.add(infoCateringCompany3);
 
     assertEquals(answer,expected);
+  }
 
+  private String registerCateringCompanyEndpoint(String name, String postCode) {
+    // construct the endpoint request
+    String request = "/registerCateringCompany?business_name=" + name + "&postcode=" + postCode;
+
+    // setup the response recepient
+
+    String response = "";
+
+    try {
+      // perform request
+      response = ClientIO.doGETRequest(clientProps.getProperty("endpoint") + request);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return response;
   }
 
   private ArrayList<ArrayList<String>> processCatererList(Collection<String> caterersInfo) {

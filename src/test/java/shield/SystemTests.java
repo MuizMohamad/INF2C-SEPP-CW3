@@ -516,5 +516,44 @@ public class SystemTests {
         // register a few company with specific postcode (USE HTTP REQUEST DIRECTLY)
         // register individual with and change the postcode to something specific (USE CLIENT FUNCTION and SETTER)
         // check if the the closest catering company is true
+
+        String company1 = "Company1";
+        String postcode1 = "EH2_9PS";
+
+        String company2 = "Company2";
+        String postcode2 = "EH8_9PS";
+
+        String company3 = "Company3";
+        String postcode3 = "EH9_9PS";
+
+        assertEquals("registered new", registerCateringCompanyEndpoint(company1, postcode1));
+        assertEquals("registered new", registerCateringCompanyEndpoint(company2, postcode2));
+        assertEquals("registered new", registerCateringCompanyEndpoint(company3, postcode3));
+
+        String chi = "1001205644";
+        assertTrue(individualClient.registerShieldingIndividual(chi));
+
+        individualClient.setPostcode("EH1_9PS");
+
+        assertEquals("Company1", individualClient.getClosestCateringCompany());
+    }
+
+    private String registerCateringCompanyEndpoint(String name, String postCode) {
+        // construct the endpoint request
+        String request = "/registerCateringCompany?business_name=" + name + "&postcode=" + postCode;
+
+        // setup the response recepient
+
+        String response = "";
+
+        try {
+            // perform request
+            response = ClientIO.doGETRequest(clientProps.getProperty("endpoint") + request);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
     }
 }
