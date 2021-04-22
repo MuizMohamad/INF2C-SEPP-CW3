@@ -621,7 +621,10 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   private boolean checkCHIFormat(String CHI){
 
     boolean goodLength = CHI.length() == 10 ;
-    assert goodLength;
+
+    if (!goodLength){
+      return false;
+    }
     boolean validDate = validateJavaDate(CHI.substring(0,6));
 
     String regex = "[0-9]+";
@@ -637,18 +640,15 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
   private boolean validateJavaDate(String strDate) {
 
-    SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
-
     try {
-      Date javaDate = format.parse(strDate);
-    }
-    /* Date format is invalid */
-    catch (ParseException e)
-    {
+      SimpleDateFormat df = new SimpleDateFormat("ddMMyy");
+      df.setLenient(false);
+      df.parse(strDate);
+      return true;
+    } catch (ParseException e) {
       return false;
     }
-      /* Return true if date format is valid */
-    return true;
+
   }
 
   private String processPostCode(String postcode){

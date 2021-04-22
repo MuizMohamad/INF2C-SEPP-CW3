@@ -152,7 +152,7 @@ public class ShieldingIndividualClientImpTest {
     answer.add(infoCateringCompany2);
     answer.add(infoCateringCompany3);
 
-    assertEquals(answer,expected);
+    assertTrue(expected.containsAll(answer));
   }
 
   private String registerCateringCompanyEndpoint(String name, String postCode) {
@@ -429,7 +429,7 @@ public class ShieldingIndividualClientImpTest {
   public void testPickFoodBox(){
 
     // construct the endpoint request
-    String request = "/showFoodBox?orderOption=catering&dietaryPreference='";
+    String request = "/showFoodBox?orderOption=catering&dietaryPreference=";
 
     // setup the response recepient
     List<FoodBox> responseBoxes = new ArrayList<FoodBox>();
@@ -446,7 +446,9 @@ public class ShieldingIndividualClientImpTest {
 
       // gather required fields
       for (FoodBox b : responseBoxes) {
-        boxIds.add(Integer.parseInt(b.getFoodBoxID()));
+        int id = Integer.parseInt(b.getFoodBoxID());
+        System.out.println(id);
+        boxIds.add(id);
       }
 
     } catch (Exception e) {
@@ -454,6 +456,7 @@ public class ShieldingIndividualClientImpTest {
     }
 
     Random rand = new Random();
+    System.out.println(boxIds.size());
     int randomId = boxIds.get(rand.nextInt(boxIds.size()));
 
     client.pickFoodBox(randomId);
