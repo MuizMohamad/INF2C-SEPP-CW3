@@ -52,7 +52,7 @@ public class FoodItem {
      *
      * @param quantity
      */
-    public void changeQuantity(int quantity){
+    public void setQuantity(int quantity){
         this.quantity = quantity;
     }
 

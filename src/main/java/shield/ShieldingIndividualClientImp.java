@@ -590,7 +590,7 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
     for (FoodItem c : tempPickedFoodBox.getContents()){
       if (c.getFoodItemID() == itemId){
-        c.changeQuantity(quantity);
+        c.setQuantity(quantity);
       }
     }
 

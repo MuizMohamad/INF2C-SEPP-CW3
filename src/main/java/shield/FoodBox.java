@@ -117,7 +117,7 @@ public class FoodBox {
     public void changeItemQuantity(int itemIds, int quantity){
         for (FoodItem i : contents){
             if (i.getFoodItemID() == itemIds){
-                i.changeQuantity(quantity);
+                i.setQuantity(quantity);
             }
         }
     }
