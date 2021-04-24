@@ -26,6 +26,13 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
     this.isRegistered = false;
   }
 
+  /**
+   * Method for register catering company
+   *
+   * @param name name of the business
+   * @param postCode post code of the business
+   * @return true if the operation occurred correctly
+   */
   @Override
   public boolean registerCateringCompany(String name, String postCode) {
 
@@ -58,6 +65,13 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
     return true;
   }
 
+  /**
+   * Method to update order status
+   *
+   * @param orderNumber the order number
+   * @param status status of the order for the requested number
+   * @return true if the operation occurred correctly
+   */
   @Override
   public boolean updateOrderStatus(int orderNumber, String status) {
     // construct the endpoint request
@@ -82,16 +96,31 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
     return responseUpdate;
   }
 
+  /*
+   * Return if the catering company is registered
+   *
+   * @return registered or not
+   */
   @Override
   public boolean isRegistered() {
     return this.isRegistered;
   }
 
+  /*
+   * Return name of catering company
+   *
+   * @return name
+   */
   @Override
   public String getName() {
     return this.name;
   }
 
+  /*
+   * Return post code of catering company
+   *
+   * @return post code
+   */
   @Override
   public String getPostCode() {
     return this.postCode;

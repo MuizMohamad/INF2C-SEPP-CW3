@@ -580,7 +580,6 @@ public class SystemTests {
         String response;
 
         try {
-            // perform request
             response = ClientIO.doGETRequest(clientProps.getProperty("endpoint") + request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -636,15 +635,13 @@ public class SystemTests {
 
     // Helper function for register catering company directly
     private String registerCateringCompanyEndpoint(String name, String postCode) {
-        // construct the endpoint request
-        String request = "/registerCateringCompany?business_name=" + name + "&postcode=" + postCode;
 
-        // setup the response recepient
+        String request = "/registerCateringCompany?business_name=" + name + "&postcode=" + postCode;
 
         String response = "";
 
         try {
-            // perform request
+
             response = ClientIO.doGETRequest(clientProps.getProperty("endpoint") + request);
 
         } catch (Exception e) {

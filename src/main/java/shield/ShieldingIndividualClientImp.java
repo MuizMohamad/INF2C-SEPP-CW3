@@ -31,6 +31,12 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
   private List<FoodBox> defaultFoodBoxList;
   private FoodBox tempPickedFoodBox;
 
+
+  /**
+   * Class constructor
+   *
+   * @param endpoint client endpoint
+   */
   public ShieldingIndividualClientImp(String endpoint) {
     this.endpoint = endpoint;
     this.isRegistered = false;
@@ -39,23 +45,39 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     this.defaultFoodBoxList = getDefaultFoodBoxListFromServer();
   }
 
+  /**
+   * Returns true if the operation occurred correctly.
+   *
+   * This method returns true if the operation occurred correctly (this includes
+   * re-registrations) and false if input incorrect (null or CHI number not
+   * respecting this format:
+   * https://datadictionary.nhs.uk/attributes/community_health_index_number.html)
+   * or any of the data retrieved from the server for the shielding individual is
+   * null.
+   *
+   * @param CHI CHI number of the shiedling individual
+   * @return true if the operation occurred correctly
+   */
   @Override
   public boolean registerShieldingIndividual(String CHI) {
 
-    Objects.requireNonNull(CHI);
+    // If object is null return false
+    if (Objects.isNull(CHI)){
+      return false;
+    }
 
+    // Wrong format return false
     if (!checkCHIFormat(CHI)){
       return false;
     }
 
+    // If already registered return true
     if (isRegistered()){
       return true;
     }
 
-    // construct the endpoint request
-    String request = "/registerShieldingIndividual?CHI=" + CHI ;
 
-    // setup the response recepient
+    String request = "/registerShieldingIndividual?CHI=" + CHI ;
 
     ArrayList<String> responseRegister;
 
@@ -82,31 +104,39 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
       return false;
     }
 
+    // Set attribute values
     this.isRegistered = true;
     this.CHI = CHI;
 
     return true;
   }
 
+  /**
+   * Returns collection of food box ids if the operation occurred correctly
+   *
+   * @param dietaryPreference
+   * @return collection of food box ids
+   */
   @Override
   public Collection<String> showFoodBoxes(String dietaryPreference) {
-    // construct the endpoint request
+
+    if (Objects.isNull(dietaryPreference)){
+      return new ArrayList<>();
+    }
     String request = "/showFoodBox?orderOption=catering&dietaryPreference=" + dietaryPreference ;
 
-    // setup the response recepient
     List<FoodBox> responseBoxes;
 
     List<String> boxIds = new ArrayList<>();
 
     try {
-      // perform request
+
       String response = ClientIO.doGETRequest(endpoint + request);
 
-      // unmarshal response
       Type listType = new TypeToken<List<FoodBox>>() {} .getType();
       responseBoxes = new Gson().fromJson(response, listType);
 
-      // gather required fields
+      // Gather all food box ids
       for (FoodBox b : responseBoxes) {
         boxIds.add(b.getFoodBoxID());
       }
@@ -118,7 +148,11 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return boxIds;
   }
 
-  // **UPDATE2** REMOVED PARAMETER
+  /**
+   * Place order function to place order on the server
+   *
+   * @return true if the operation occurred correctly
+   */
   @Override
   public boolean placeOrder() {
 
@@ -126,15 +160,18 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
       return false;
     }
 
+    // Get closest catering company to the individual
     Collection<String> allCatererList = getCateringCompanies();
     ArrayList<ArrayList<String>> caterersInfo = processCatererList(allCatererList);
 
     String closestCateringName = getClosestCateringCompany();
     String closestCateringPostCode = getPostCodefromCaterersList(caterersInfo,closestCateringName);
+
     // construct the endpoint request
     String request = "placeOrder?individual_id="+ this.CHI + "&catering_business_name=" + closestCateringName +
             "&catering_postcode=" + closestCateringPostCode ;
 
+    // Convert picked food box to JSON
     Gson gson = new Gson();
     String foodBoxInfoJson = "{\"contents\":"+gson.toJson(tempPickedFoodBox.getContents()) + "}";
     System.out.println(foodBoxInfoJson);
@@ -152,31 +189,43 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
       e.printStackTrace();
     }
 
+    // Add to order history
     Order placedOrder = new Order(tempPickedFoodBox,"0",responseOrderID);
     orderHistory.add(placedOrder);
 
     return true;
   }
 
+  /**
+   * Edit order function for specific order number
+   *
+   * @param orderNumber the order number
+   * @return true if the operation occurred correctly
+   */
   @Override
   public boolean editOrder(int orderNumber) {
+
     // construct the endpoint request
     String request = "/editOrder?order_id=" + orderNumber ;
 
     boolean responseEdit = false;
 
+    // update the local order status
     requestOrderStatus(orderNumber);
     String orderStatus = getStatusForOrder(orderNumber);
+
+    // if order status not PLACED return false
     if (!orderStatus.equals("PLACED")){
       return false;
     }
 
+    // Get order object
     Order placedOrder = getOrdersOrderNumber(orderNumber);
 
+    // Get edited food box
     FoodBox editedFoodBox = placedOrder.getOrderedFoodBox();
     Gson gson = new Gson();
     String foodBoxInfoJson = "{\"contents\":"+gson.toJson(editedFoodBox.getContents()) + "}";
-    System.out.println(foodBoxInfoJson);
 
     try {
       // perform request
@@ -193,6 +242,12 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return responseEdit;
   }
 
+  /**
+   * Cancel order for specific order number
+   *
+   * @param orderNumber the order number
+   * @return true if the operation occurred correctly
+   */
   @Override
   public boolean cancelOrder(int orderNumber) {
     // construct the endpoint request
@@ -219,13 +274,19 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return responseCancel;
   }
 
+  /**
+   * Update local order status
+   *
+   * @param orderNumber the order number
+   * @return true if the operation occurred correctly
+   */
   @Override
   public boolean requestOrderStatus(int orderNumber) {
+
     // construct the endpoint request
     String request = "/requestStatus?order_id=" + orderNumber;
 
     // setup the response recepient
-
     String response;
 
     try {
@@ -239,12 +300,18 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     if (response.equals("-1")){
       return false;
     }
+
+    // Set order status in order history
     Objects.requireNonNull(getOrdersOrderNumber(orderNumber)).setOrderStatus(response);
 
     return true;
   }
 
-  // **UPDATE**
+  /**
+   * Get collection of catering companies and their locations
+   *
+   * @return collection of catering companies and their locations
+   */
   @Override
   public Collection<String> getCateringCompanies() {
     // construct the endpoint request
@@ -269,14 +336,26 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return responseCaterers;
   }
 
-  // **UPDATE**
+  /**
+   * Get the distance between two locations based on their post codes from post code
+   *
+   * @param postCode1 post code of one location
+   * @param postCode2 post code of another location
+   * @return the distance as a float between the two locations
+   */
   @Override
   public float getDistance(String postCode1, String postCode2) {
+
     Objects.requireNonNull(postCode1);
     Objects.requireNonNull(postCode2);
+
     if (!checkPostCodeFormat(postCode1) || !checkPostCodeFormat(postCode2)){
-      return 0;
+
+      System.out.println("Wrong format, Infinity value will be returned");
+      return Float.POSITIVE_INFINITY;
+
     }
+
     // construct the endpoint request
     String request = "/distance?postcode1=" + postCode1 + "&postcode2=" + postCode2 ;
     System.out.println(request);
@@ -299,41 +378,96 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return responseDistance;
   }
 
+  /**
+   * Returns if the individual using the client is registered with the server
+   *
+   * @return true if the individual using the client is registered with the server
+   */
   @Override
   public boolean isRegistered() {
     return this.isRegistered;
   }
 
+  /**
+   * Returns the CHI number of the shiedling individual
+   *
+   * @return CHI number of the shiedling individual
+   */
   @Override
   public String getCHI() {
     return this.CHI;
   }
 
+  /**
+   * Setter method for default food box list
+   * for testing
+   *
+   * @param defaultFoodBoxList list of food box to be set
+   */
   @Override
   public void setDefaultFoodBoxList(ArrayList<FoodBox> defaultFoodBoxList){
     this.defaultFoodBoxList = defaultFoodBoxList;
   }
 
+  /**
+   * Returns the number of available food boxes after quering the server
+   *
+   * @return number of available food boxes after quering the server
+   */
   @Override
   public int getFoodBoxNumber() {
     return defaultFoodBoxList.size();
   }
 
+  /**
+   * Returns the dietary preference that this specific food box satisfies
+   *
+   * @param  foodBoxId the food box id as last returned from the server
+   * @return dietary preference
+   */
   @Override
   public String getDietaryPreferenceForFoodBox(int foodBoxId) {
     FoodBox foundFoodBox = getFoodBoxfromID(foodBoxId);
-    assert foundFoodBox != null;
+
+    // if food box id is not found return empty string
+    if (Objects.isNull(foundFoodBox)){
+      return "";
+    }
+
     return foundFoodBox.getFoodBoxDiet();
   }
 
+  /**
+   * Returns the number of items in this specific food box.
+   *
+   * This method returns the number of items in each food box (not the quantity
+   * of each item).
+   * For example if a box has:
+   *  - 3 bananas
+   *  - 5 bottles of milk
+   * it should return 2.
+   * @param  foodBoxId the food box id as last returned from the server
+   * @return number of items in the food box
+   */
   @Override
   public int getItemsNumberForFoodBox(int foodBoxId) {
 
     FoodBox foundFoodBox = getFoodBoxfromID(foodBoxId);
-    assert foundFoodBox != null;
+
+    // if not found return 0
+    if (Objects.isNull(foundFoodBox)){
+      return 0;
+    }
+
     return foundFoodBox.getContents().size();
   }
 
+  /**
+   * Returns the collection of item ids of the requested foodbox
+   *
+   * @param  foodboxId the food box id as last returned from the server
+   * @return collection of item ids of the requested foodbox
+   */
   @Override
   public Collection<Integer> getItemIdsForFoodBox(int foodboxId) {
 
@@ -361,17 +495,41 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return null;
   }
 
+  /**
+   * Returns the item name of the item in the requested foodbox
+   *
+   * @param  itemId the food box id as last returned from the server
+   * @param  foodBoxId the food box id as last returned from the server
+   * @return the requested item name
+   */
   @Override
   public String getItemNameForFoodBox(int itemId, int foodBoxId) {
+
     FoodItem foundFoodItem = getFoodItemfromID(itemId,foodBoxId);
-    assert foundFoodItem != null;
+
+    // is not found return empty string
+    if (Objects.isNull(foundFoodItem)){
+      return "";
+    }
     return foundFoodItem.getItemName();
   }
 
+  /**
+   * Returns the item quantity of the item in the requested foodbox
+   *
+   * @param  itemId the food box id as last returned from the server
+   * @param  foodBoxId the food box id as last returned from the server
+   * @return the requested item quantity
+   */
   @Override
   public int getItemQuantityForFoodBox(int itemId, int foodBoxId) {
     FoodItem foundFoodItem = getFoodItemfromID(itemId,foodBoxId);
-    assert foundFoodItem != null;
+
+    // is not found return empty string
+    if (Objects.isNull(foundFoodItem)){
+      return 0;
+    }
+
     return foundFoodItem.getQuantity();
   }
 
@@ -379,7 +537,11 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
 
     FoodBox foundFoodBox = getFoodBoxfromID(foodBoxID);
 
-    assert foundFoodBox != null;
+    // is not found return null
+    if (Objects.isNull(foundFoodBox)){
+      return null;
+    }
+
     for (FoodItem f : foundFoodBox.getContents()){
       if(f.getFoodItemID() == itemID){
             return f;
@@ -388,18 +550,41 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return null;
   }
 
+  /**
+   * Getter method for picked food box
+   * for testing
+   *
+   * @return picked food box
+   */
   @Override
   public FoodBox getPickedFoodBox(){
     return tempPickedFoodBox;
   }
 
+  /**
+   * Returns true if the requested foodbox was picked.
+   *
+   * @param  foodBoxId the food box id as last returned from the server
+   * @return true if the requested foodbox was picked
+   */
   @Override
   public boolean pickFoodBox(int foodBoxId) {
     tempPickedFoodBox = getFoodBoxfromID(foodBoxId);
-    Objects.requireNonNull(tempPickedFoodBox);
+
+    if(Objects.isNull(tempPickedFoodBox)){
+      return false;
+    }
+
     return true;
   }
 
+  /**
+   * Returns true if the item quantity for the picked foodbox was changed
+   *
+   * @param  itemId the food box id as last returned from the server
+   * @param  quantity the food box item quantity to be set
+   * @return true if the item quantity for the picked foodbox was changed
+   */
   @Override
   public boolean changeItemQuantityForPickedFoodBox(int itemId, int quantity) {
 
@@ -412,11 +597,22 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return true;
   }
 
+  /**
+   * Setter for order history list
+   * for testing
+   */
   @Override
   public void setOrderHistory(ArrayList<Order> orderHistory){
     this.orderHistory = orderHistory;
   }
 
+  /**
+   * Returns the collection of the order numbers placed.
+   *
+   * This method queries the order ids for a placed order as stored locally by
+   * the client.
+   * @return collection of the order numbers placed
+   */
   @Override
   public Collection<Integer> getOrderNumbers() {
 
@@ -428,11 +624,24 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return orderIDs;
   }
 
+  /**
+   * Returns the status of the order for the requested number.
+   *
+   * This method queries the status for a placed order as stored locally by
+   * the client.
+   * @param orderNumber the order number
+   * @return status of the order for the requested number
+   */
   @Override
   public String getStatusForOrder(int orderNumber) {
 
     Order chosenOrder = getOrdersOrderNumber(orderNumber);
-    Objects.requireNonNull(chosenOrder);
+
+    // if order not found return empty string
+    if (Objects.isNull(chosenOrder)){
+      return "";
+    }
+
     switch (chosenOrder.getOrderStatus()) {
       case "0" :
         return "PLACED";
@@ -449,13 +658,23 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     }
   }
 
+  /**
+   * Returns the item ids for the items of the requested order.
+   *
+   * This method queries the item ids for a placed order as stored locally by
+   * the client.
+   * @param  orderNumber the order number
+   * @return item ids for the items of the requested order
+   */
   @Override
   public Collection<Integer> getItemIdsForOrder(int orderNumber) {
     Order chosenOrder = getOrdersOrderNumber(orderNumber);
 
     List<Integer> itemIDs = new ArrayList<Integer>();
 
-    assert chosenOrder != null;
+    if (Objects.isNull(chosenOrder)){
+      return new ArrayList<>();
+    }
     FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
     List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
 
@@ -465,11 +684,22 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return itemIDs;
   }
 
+  /**
+   * Returns the name of the item for the requested order.
+   *
+   * This method queries the item name for a placed order as stored locally by
+   * the client.
+   * @param  itemId the food box id as last returned from the server
+   * @param  orderNumber the order number
+   * @return name of the item for the requested order
+   */
   @Override
   public String getItemNameForOrder(int itemId, int orderNumber) {
     Order chosenOrder = getOrdersOrderNumber(orderNumber);
 
-    assert chosenOrder != null;
+    if (Objects.isNull(chosenOrder)){
+      return "";
+    }
     FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
     List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
 
@@ -482,11 +712,23 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return null;
   }
 
+  /**
+   * Returns the quantity of the item for the requested order.
+   *
+   * This method queries the quantities for a placed order as stored locally by
+   * the client.
+   * @param  itemId the food box id as last returned from the server
+   * @param  orderNumber the order number
+   * @return quantity of the item for the requested order
+   */
   @Override
   public int getItemQuantityForOrder(int itemId, int orderNumber) {
     Order chosenOrder = getOrdersOrderNumber(orderNumber);
 
-    assert chosenOrder != null;
+    if (Objects.isNull(chosenOrder)){
+      return 0;
+    }
+
     FoodBox chosenFoodBox =chosenOrder.getOrderedFoodBox();
     List<FoodItem> foodBoxContent = chosenFoodBox.getContents();
 
@@ -507,6 +749,19 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return null;
   }
 
+  /**
+   * Returns true if quantity of the item for the requested order was changed.
+   *
+   * This method changes the quantities for a placed order as stored locally
+   * by the client.
+   * In order to sync with the server, one needs to call the editOrder()
+   * method separately.
+   *
+   * @param  itemId the food box id as last returned from the server
+   * @param  orderNumber the order number
+   * @param  quantity the food box item quantity to be set
+   * @return true if quantity of the item for the requested order was changed
+   */
   @Override
   public boolean setItemQuantityForOrder(int itemId, int orderNumber, int quantity) {
 
@@ -523,26 +778,44 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
     return true;
   }
 
+  /**
+   * Getter for individual postcode
+   * for testing
+   *
+   * @return postcode attribute of the individual
+   */
   @Override
   public String getPostcode(){
     return this.postcode;
   }
 
+  /**
+   * Setter for individual postcode
+   * for testing
+   *
+   * @param postcode postcode to be set
+   */
   @Override
   public void setPostcode(String postcode){
     this.postcode = postcode;
   }
 
-  // **UPDATE**
+  /**
+   * Returns closest catering company serving orders based on our location
+   *
+   * @return business name of catering company
+   */
   @Override
   public String getClosestCateringCompany() {
 
     Collection<String> caterersListCollection = getCateringCompanies();
     ArrayList<ArrayList<String>> caterersInfo = processCatererList(caterersListCollection);
 
+    // initially max distance is infinity
     float currentMinDist = (float) Double.POSITIVE_INFINITY;
     String currentClosestCaterer = "";
 
+    // find minimum
     for (ArrayList<String> info : caterersInfo){
 
       String catererName = info.get(0);
@@ -555,7 +828,6 @@ public class ShieldingIndividualClientImp implements ShieldingIndividualClient {
         currentClosestCaterer = catererName;
       }
     }
-
 
     return currentClosestCaterer;
   }

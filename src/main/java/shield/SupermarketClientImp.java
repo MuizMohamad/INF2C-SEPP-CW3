@@ -15,11 +15,23 @@ public class SupermarketClientImp implements SupermarketClient {
   private String postCode;
   private boolean isRegistered;
 
+  /*
+   * Class constructor
+   *
+   * @param endpoint
+   */
   public SupermarketClientImp(String endpoint) {
     this.endpoint = endpoint;
     this.isRegistered = false;
   }
 
+  /**
+   * Method to register supermarket
+   *
+   * @param name name of the business
+   * @param postCode post code of the business
+   * @return true if the operation occurred correctly
+   */
   @Override
   public boolean registerSupermarket(String name, String postCode) {
 
@@ -52,6 +64,13 @@ public class SupermarketClientImp implements SupermarketClient {
     return true;
   }
 
+  /**
+   * Method to record supermarket order on server
+   *
+   * @param CHI CHI number of the shiedling individual associated with this order
+   * @param orderNumber the order number
+   * @return true if the operation occurred correctly
+   */
   @Override
   public boolean recordSupermarketOrder(String CHI, int orderNumber) {
 
@@ -78,7 +97,13 @@ public class SupermarketClientImp implements SupermarketClient {
     return responseRecord;
   }
 
-  // **UPDATE**
+  /**
+   * Method to update order status of order placed
+   *
+   * @param orderNumber the order number
+   * @param status status of the order for the requested number
+   * @return true if the operation occurred correctly
+   */
   @Override
   public boolean updateOrderStatus(int orderNumber, String status) {
     // construct the endpoint request
@@ -103,16 +128,31 @@ public class SupermarketClientImp implements SupermarketClient {
     return responseUpdate;
   }
 
+  /*
+   * Return if the company is registered or not
+   *
+   * @return isRegistered
+   */
   @Override
   public boolean isRegistered() {
     return this.isRegistered;
   }
 
+  /*
+   * Getter for catering company name
+   *
+   * @return name
+   */
   @Override
   public String getName() {
     return this.name;
   }
 
+  /*
+   * Getter for catering company post code
+   *
+   * @return post code
+   */
   @Override
   public String getPostCode() {
     return this.postCode;

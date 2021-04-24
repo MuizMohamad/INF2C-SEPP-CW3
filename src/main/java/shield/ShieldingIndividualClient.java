@@ -174,7 +174,6 @@ public interface ShieldingIndividualClient extends ShieldingIndividualClientEndp
   */
   public int getItemQuantityForOrder(int itemId, int orderNumber);
 
-  // **UPDATE2** COMMENT ONLY
   /**
    * Returns true if quantity of the item for the requested order was changed.
    *
