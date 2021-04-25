@@ -15,7 +15,7 @@ public class SupermarketClientImp implements SupermarketClient {
   private String postCode;
   private boolean isRegistered;
 
-  /*
+  /**
    * Class constructor
    *
    * @param endpoint
@@ -128,7 +128,7 @@ public class SupermarketClientImp implements SupermarketClient {
     return responseUpdate;
   }
 
-  /*
+  /**
    * Return if the company is registered or not
    *
    * @return isRegistered
@@ -138,7 +138,7 @@ public class SupermarketClientImp implements SupermarketClient {
     return this.isRegistered;
   }
 
-  /*
+  /**
    * Getter for catering company name
    *
    * @return name
@@ -148,7 +148,7 @@ public class SupermarketClientImp implements SupermarketClient {
     return this.name;
   }
 
-  /*
+  /**
    * Getter for catering company post code
    *
    * @return post code

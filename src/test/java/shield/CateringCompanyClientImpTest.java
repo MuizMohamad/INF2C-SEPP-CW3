@@ -47,6 +47,10 @@ public class CateringCompanyClientImpTest {
   }
 
 
+  /**
+   * Test 'registerCateringCompany' method.
+   * When the postcode format is valid, the registration should success.
+   */
   @Test
   public void testCateringCompanyNewRegistrationValidPostcodeFormat() {
 
@@ -56,6 +60,10 @@ public class CateringCompanyClientImpTest {
     assertTrue(client.registerCateringCompany(name, postCode));
   }
 
+  /**
+   * Test 'registerCateringCompany' method.
+   * When the postcode format is invalid, the registration should fail.
+   */
   @Test
   public void testCateringCompanyNewRegistrationInvalidPostcodeFormat(){
     String name = "InvalidPostcodeCompany";

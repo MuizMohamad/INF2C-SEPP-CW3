@@ -47,7 +47,10 @@ public class ShieldingIndividualClientImpTest {
     client = new ShieldingIndividualClientImp(clientProps.getProperty("endpoint"));
   }
 
-
+  /**
+   * Test 'registerShieldingIndividual' method.
+   * When the CHI format is valid, The registration should success
+   */
   @Test
   public void testShieldingIndividualNewRegistrationValidCHI() {
 
@@ -57,6 +60,10 @@ public class ShieldingIndividualClientImpTest {
     assertTrue(client.registerShieldingIndividual(chi),"Registration Failed");
   }
 
+  /**
+   * Test 'registerShieldingIndividual' method.
+   * When the CHI format is invalid, The registration should fail
+   */
   @Test
   public void testShieldingIndividualNewRegistrationInvalidCHIWrongLength() {
 
@@ -66,6 +73,10 @@ public class ShieldingIndividualClientImpTest {
     assertFalse(client.registerShieldingIndividual(chi),"Registration Should Fail");
   }
 
+  /**
+   * Test 'registerShieldingIndividual' method.
+   * When the date format is invalid, The registration should fail
+   */
   @Test
   public void testShieldingIndividualNewRegistrationInvalidCHIWrongDate() {
 
@@ -75,6 +86,10 @@ public class ShieldingIndividualClientImpTest {
     assertFalse(client.registerShieldingIndividual(chi),"Registration Failed");
   }
 
+  /**
+   * Test 'showFoodBoxes' method.
+   * All food boxes returned by the method must have correct dietary preference
+   */
   @Test
   public void testShowFoodBoxCorrectDiet(){
 
@@ -114,6 +129,10 @@ public class ShieldingIndividualClientImpTest {
 
   }
 
+  /**
+   * Test 'getCateringCompanies' method.
+   * Should return list of catering companies that already registered
+   */
   @Test
   public void testGetCateringCompanies(){
 
@@ -154,6 +173,7 @@ public class ShieldingIndividualClientImpTest {
 
     assertTrue(expected.containsAll(answer));
   }
+
 
   private String registerCateringCompanyEndpoint(String name, String postCode) {
     // construct the endpoint request
@@ -199,14 +219,22 @@ public class ShieldingIndividualClientImpTest {
     return processedList;
   }
 
+  /**
+   * Test 'getDistance' method.
+   * When the postcode format is wrong, the distance should be 0.
+   */
   @Test
   public void testGetDistanceWrongPostcodeFormat() {
     String postcode1 = "EH934";
     String postcode2 = "EH8_9PS";
 
-    assertEquals(0,client.getDistance(postcode1,postcode2));
+    assertEquals(Float.POSITIVE_INFINITY, client.getDistance(postcode1,postcode2));
   }
 
+  /**
+   * Test 'getFoodBoxNumber' method.
+   * Method should return the number of available foodbox.
+   */
   @Test
   public void testGetFoodBoxNumber(){
 
@@ -236,6 +264,10 @@ public class ShieldingIndividualClientImpTest {
     assertEquals(test_length,client.getFoodBoxNumber());
   }
 
+  /**
+   * Test 'getDietaryPreferenceForFoodBox' method.
+   * Method should return the dietary preference for foodbox requested
+   */
   @Test
   public void testGetDietaryPreferenceForFoodBox(){
 
@@ -269,6 +301,10 @@ public class ShieldingIndividualClientImpTest {
 
   }
 
+  /**
+   * Test 'getItemsNumberForFoodBox' method.
+   * Method should return the number of items in a foodbox.
+   */
   @Test
   public void testGetItemsNumberForFoodBox(){
 
@@ -302,6 +338,10 @@ public class ShieldingIndividualClientImpTest {
 
   }
 
+  /**
+   * Test 'getItemIdsForFoodBox' method.
+   * Method should return collection of ID of each item for requested foodbox.
+   */
   @Test
   public void testGetItemIdsForFoodBox(){
     // create specific list and use setter
@@ -343,6 +383,10 @@ public class ShieldingIndividualClientImpTest {
     assertEquals(testIds,client.getItemIdsForFoodBox(120));
   }
 
+  /**
+   * Test 'getItemNameForFoodBox' method.
+   * Method should return the name of an item of a requested foodbox
+   */
   @Test
   public void testGetItemNameForFoodBox(){
     // create specific food boox list
@@ -385,6 +429,10 @@ public class ShieldingIndividualClientImpTest {
 
   }
 
+  /**
+   * Test 'getItemQuantityForFoodBox' method.
+   * Method should return the quantity of an item of a requested foodbox
+   */
   @Test
   public void testGetItemQuantityForFoodBox(){
     //check if item quantity the same
@@ -425,6 +473,11 @@ public class ShieldingIndividualClientImpTest {
 
   }
 
+  /**
+   * Test 'pickFoodBox' method.
+   * Method should get the correct foodbox.
+   * In this test it is verified by checking the id.
+   */
   @Test
   public void testPickFoodBox(){
 
@@ -465,6 +518,11 @@ public class ShieldingIndividualClientImpTest {
 
   }
 
+  /**
+   * Test 'changeItemQuantityForPickedFoodBox' method.
+   * Method should change the quantity of an item of the foodbox that
+   * was picked using 'pickFoodBox' method
+   */
   @Test
   public void testChangeItemQuantityForPickedFoodBox(){
     // check if the item quantity does changed
@@ -514,6 +572,10 @@ public class ShieldingIndividualClientImpTest {
     assertEquals(3, client.getItemQuantityForFoodBox(6,120));
   }
 
+  /**
+   * Test 'getOrderNumbers' method.
+   * Method should return a collection of order numbers.
+   */
   @Test
   public void testGetOrderNumbers(){
     // create a order history list and use setter
@@ -552,6 +614,10 @@ public class ShieldingIndividualClientImpTest {
 
   }
 
+  /**
+   * Test 'getStatusForOrder' method.
+   * Method should return status of selected order.
+   */
   @Test
   public void testGetStatusForOrder(){
     // test if order has same status as created
@@ -581,6 +647,10 @@ public class ShieldingIndividualClientImpTest {
     assertEquals("CANCELLED", client.getStatusForOrder(5));
   }
 
+  /**
+   * Test 'getItemIdsForOrder' method.
+   * Method should return collection of item ids for a requested order
+   */
   @Test
   public void testGetItemIdsForOrder(){
     // test same item ids as created object
@@ -616,6 +686,10 @@ public class ShieldingIndividualClientImpTest {
     assertEquals(itemIDS, client.getItemIdsForOrder(1));
   }
 
+  /**
+   * Test 'getItemNameForOrder' method.
+   * Method should return name of an item for a requested order
+   */
   @Test
   public void testGetItemNameForOrder(){
     FoodBox foodBox1 = new FoodBox();
@@ -654,6 +728,10 @@ public class ShieldingIndividualClientImpTest {
     assertEquals("Name3", client.getItemNameForOrder(6, 1));
   }
 
+  /**
+   * Test 'getItemQuantityForOrder' method.
+   * Method should return quantity of an item for a requested order
+   */
   @Test
   public void testGetItemQuantityForOrder(){
     // check if item quantity same for order
@@ -693,6 +771,10 @@ public class ShieldingIndividualClientImpTest {
     assertEquals(1, client.getItemQuantityForOrder(6, 1));
   }
 
+  /**
+   * Test 'setItemQuantityForOrder' method.
+   * Method should able to reduce the quantity of an item for a requested order
+   */
   @Test
   public void testSetItemQuantityForOrder(){
     // check if item quantity is same as changed

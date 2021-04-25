@@ -96,7 +96,7 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
     return responseUpdate;
   }
 
-  /*
+  /**
    * Return if the catering company is registered
    *
    * @return registered or not
@@ -106,7 +106,7 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
     return this.isRegistered;
   }
 
-  /*
+  /**
    * Return name of catering company
    *
    * @return name
@@ -116,7 +116,7 @@ public class CateringCompanyClientImp implements CateringCompanyClient {
     return this.name;
   }
 
-  /*
+  /**
    * Return post code of catering company
    *
    * @return post code
