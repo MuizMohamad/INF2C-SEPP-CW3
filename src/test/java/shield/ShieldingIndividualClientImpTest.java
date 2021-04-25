@@ -52,7 +52,7 @@ public class ShieldingIndividualClientImpTest {
   public void testShieldingIndividualNewRegistrationValidCHI() {
 
     Random rand = new Random();
-    String chi = String.valueOf(1001205638);
+    String chi = String.valueOf(1001994338);
 
     assertTrue(client.registerShieldingIndividual(chi),"Registration Failed");
   }
@@ -204,7 +204,7 @@ public class ShieldingIndividualClientImpTest {
     String postcode1 = "EH934";
     String postcode2 = "EH8_9PS";
 
-    assertEquals(0,client.getDistance(postcode1,postcode2));
+    assertEquals(Float.POSITIVE_INFINITY,client.getDistance(postcode1,postcode2));
   }
 
   @Test
