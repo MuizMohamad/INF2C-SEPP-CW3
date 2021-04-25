@@ -47,6 +47,10 @@ public class SupermarketClientImpTest {
   }
 
 
+  /**
+   * Test 'registerSupermarket' method.
+   * When the postcode format is valid, the registration should success.
+   */
   @Test
   public void testSupermarketNewRegistrationValidPostcodeFormat() {
 
@@ -56,6 +60,10 @@ public class SupermarketClientImpTest {
     assertTrue(client.registerSupermarket(name, postCode));
   }
 
+  /**
+   * Test 'registerSupermarket' method.
+   * When the postcode format is invalid, the registration should fail.
+   */
   @Test
   public void testSupermarketNewRegistrationInvalidPostcodeFormat(){
     String name = "InvalidPostcodeCompany";

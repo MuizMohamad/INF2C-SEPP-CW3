@@ -142,7 +142,7 @@ public class SystemTests {
         assertEquals(response,"already registered");
     }
 
-    /*
+    /**
      *  Test place order use case in general case
      *  No edit food box involved
      */
@@ -150,7 +150,7 @@ public class SystemTests {
     public void testPlaceOrderGeneral(){
 
         // Register individual
-        String chi = "1001205638";
+        String chi = "1001205639";
         assertTrue(individualClient.registerShieldingIndividual(chi));
 
         // Register catering company
@@ -180,7 +180,7 @@ public class SystemTests {
 
     }
 
-    /*
+    /**
      *  Test place order use case in the case of individual not registered
      *  Should fail
      */
@@ -197,7 +197,7 @@ public class SystemTests {
         assertEquals(allOrders.size(),0);
     }
 
-    /*
+    /**
      *  Test place order use case in general case
      *  with edit food box involved
      */
@@ -240,7 +240,7 @@ public class SystemTests {
 
     }
 
-    /*
+    /**
      * Test edit food box after order is placed
      */
     @Test
@@ -282,7 +282,7 @@ public class SystemTests {
 
     }
 
-    /*
+    /**
      *  Test edit food box after it has been packed
      *  which should fail
      */
@@ -330,14 +330,14 @@ public class SystemTests {
     }
 
 
-    /*
+    /**
      * Test for cancel order use case
      */
     @Test
     public void testCancelOrder(){
 
         // Register individual
-        String chi = "1001205639";
+        String chi = "1001207639";
         assertTrue(individualClient.registerShieldingIndividual(chi));
 
         // Register catering company
@@ -367,7 +367,7 @@ public class SystemTests {
         assertEquals("CANCELLED",individualClient.getStatusForOrder(firstOrderNumber));
     }
 
-    /*
+    /**
      * Test cancel order when the order is packed
      */
     @Test
@@ -409,7 +409,7 @@ public class SystemTests {
         assertEquals("CANCELLED",individualClient.getStatusForOrder(firstOrderNumber));
     }
 
-    /*
+    /**
      * Test cancel order should fail after the order was dispatched
      */
     @Test
@@ -455,7 +455,7 @@ public class SystemTests {
         assertEquals("DISPATCHED",individualClient.getStatusForOrder(firstOrderNumber));
     }
 
-    /*
+    /**
      *  Test that the request order status give the correct order status,
      *  by updating the order status on specific value and check if the requested status is the same
      */
@@ -528,7 +528,7 @@ public class SystemTests {
         return responseUpdate;
     }
 
-    /*
+    /**
      *  Test that update order status will update the server correctly
      *   and also when we request the status, it will be the same status as the updated one.
     */
@@ -602,7 +602,7 @@ public class SystemTests {
         }
     }
 
-    /*
+    /**
      * Test that the function get closest catering company will return the closest one
      */
     @Test
