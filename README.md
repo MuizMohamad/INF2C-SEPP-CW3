@@ -1,6 +1,10 @@
-# UoE SEPP 2021 Coursework 3 skeleton
+# COVID-19 shielding food box delivery system
 
-This is the base skeleton for coursework 3 of the SEPP 2021 course at the University of Edinburgh.
+In addition to writing the code implementation for the system, we are also required to do :
+
+1. Requirements engineering on the software specification.
+2. Create and document a design for the software after the doing the requirement engineering.
+3. Finally, construct the code for the software, in addition to unit testing for the implementation.
 
 ## Server side
 
