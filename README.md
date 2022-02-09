@@ -14,4 +14,4 @@ The server side implementation of this protocol can be found [here][1], which ar
 
 ## Testing
 
-Tests are done using JUnit 
+Tests are done using JUnit, and we are also require to design the tests ourselves. 
