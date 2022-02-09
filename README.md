@@ -8,6 +8,10 @@ In addition to writing the code implementation for the system, we are also requi
 
 ## Server side
 
-The server side implementation of this protocol can be found [here][1].
+The server side implementation of this protocol can be found [here][1], which are written in Python using Flask.
 
 [1]: https://github.com/mocialov/sepp
+
+## Testing
+
+Tests are done using JUnit 
